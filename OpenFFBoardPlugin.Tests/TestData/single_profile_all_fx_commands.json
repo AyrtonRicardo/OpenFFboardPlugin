@@ -1,0 +1,17 @@
+{
+  "release": 1,
+  "global": { "donotnotifyUpdates": false, "language": "en" },
+  "profiles": [
+    {
+      "name": "TestGame",
+      "data": [
+        { "fullname": "FX.filterCfFreq", "cls": "fx", "instance": 1, "cmd": "filterCfFreq", "value": 1000 },
+        { "fullname": "FX.filterCfQ",    "cls": "fx", "instance": 1, "cmd": "filterCfQ",    "value": 10   },
+        { "fullname": "FX.spring",       "cls": "fx", "instance": 1, "cmd": "spring",       "value": 80   },
+        { "fullname": "FX.friction",     "cls": "fx", "instance": 1, "cmd": "friction",     "value": 50   },
+        { "fullname": "FX.damper",       "cls": "fx", "instance": 1, "cmd": "damper",       "value": 60   },
+        { "fullname": "FX.inertia",      "cls": "fx", "instance": 1, "cmd": "inertia",      "value": 30   }
+      ]
+    }
+  ]
+}

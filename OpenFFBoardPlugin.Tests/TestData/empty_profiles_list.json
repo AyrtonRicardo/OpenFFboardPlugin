@@ -1,0 +1,8 @@
+{
+  "release": 1,
+  "global": {
+    "donotnotifyUpdates": false,
+    "language": "en"
+  },
+  "profiles": []
+}

@@ -1,0 +1,25 @@
+{
+  "release": 2,
+  "global": {
+    "donotnotifyUpdates": false,
+    "language": "en"
+  },
+  "profiles": [
+    {
+      "name": "iRacing",
+      "data": [
+        { "fullname": "FX.spring",       "cls": "fx",   "instance": 1, "cmd": "spring",       "value": 80  },
+        { "fullname": "FX.damper",       "cls": "fx",   "instance": 1, "cmd": "damper",       "value": 60  },
+        { "fullname": "Axis.power",      "cls": "axis", "instance": 1, "cmd": "power",        "value": 100 },
+        { "fullname": "Axis.degrees",    "cls": "axis", "instance": 1, "cmd": "degrees",      "value": 900 }
+      ]
+    },
+    {
+      "name": "Assetto Corsa",
+      "data": [
+        { "fullname": "FX.friction",     "cls": "fx",   "instance": 1, "cmd": "friction",     "value": 50  },
+        { "fullname": "Axis.fxratio",    "cls": "axis", "instance": 1, "cmd": "fxratio",      "value": 80  }
+      ]
+    }
+  ]
+}
