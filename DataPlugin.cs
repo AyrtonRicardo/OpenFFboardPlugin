@@ -100,18 +100,6 @@ namespace OpenFFBoardPlugin
 
         public void ConnectToBoard(int hidDeviceIndex = 0)
         {
-            if (BoardsHid == null || BoardsHid.Length == 0)
-            {
-                SimHub.Logging.Current.Error("No HID devices found. Cannot connect to board.");
-                return;
-            }
-
-            if (hidDeviceIndex < 0 || hidDeviceIndex >= BoardsHid.Length)
-            {
-                SimHub.Logging.Current.Error($"HID device index {hidDeviceIndex} is out of range (0–{BoardsHid.Length - 1}).");
-                return;
-            }
-
             OpenFFBoard = new OpenFFBoard.Hid(BoardsHid[hidDeviceIndex]);
             OpenFFBoard.Connect();
 
@@ -202,26 +190,16 @@ namespace OpenFFBoardPlugin
         /// <param name="pluginManager"></param>
         public void Init(PluginManager pluginManager)
         {
-            this.PluginManager = pluginManager;
-
             SimHub.Logging.Current.Info("Starting plugin");
 
             // Load settings
-            Settings = this.ReadCommonSettings<DataPluginSettings>(settingsName, () => new DataPluginSettings());
+            Settings = this.ReadCommonSettings<DataPluginSettings>("GeneralSettings", () => new DataPluginSettings());
 
-            BoardsHid = global::OpenFFBoard.Hid.GetBoardsAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            var task = global::OpenFFBoard.Hid.GetBoardsAsync();
+            task.Wait();
+            BoardsHid = task.Result;
 
-            if (Settings.AutoConnectOnStartup)
-            {
-                int deviceIndex = 0;
-                if (BoardsHid != null && !string.IsNullOrEmpty(Settings.SelectedHidDeviceId))
-                {
-                    int found = Array.FindIndex(BoardsHid, d => d.DeviceId == Settings.SelectedHidDeviceId);
-                    if (found >= 0) deviceIndex = found;
-                }
-
-                ConnectToBoard(deviceIndex);
-            }
+            ConnectToBoard();
 
             UpdateProfileDataIfConnected();
 

@@ -67,10 +67,9 @@ namespace OpenFFBoardPlugin
             }
 
             List<BoardText> boards = new List<BoardText>();
-            var devices = Plugin.BoardsHid ?? new IHidDevice[0];
-            for (int i = 0; i < devices.Length; i++)
+            for (int i = 0; i < Plugin.BoardsHid?.Length; i++)
             {
-                IHidDevice device = devices[i];
+                IHidDevice device = Plugin.BoardsHid[i];
                 bool isSelected = Plugin.Settings.SelectedHidDeviceId != null && Plugin.Settings.SelectedHidDeviceId.Equals(device.DeviceId);
                 boards.Add(new BoardText() { Name = device.DeviceId, DeviceIndex = i, IsEnabled = isSelected });
             }
@@ -123,7 +122,7 @@ namespace OpenFFBoardPlugin
                 var selected = SelectedBoard();
                 if (selected == null)
                 {
-                    var res = await SHMessageBox.Show("Please select a HID device", "No HID device selected", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Question);
+                    var res = await SHMessageBox.Show("Please select a COM", "No COM selected", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Question);
                     await SHMessageBox.Show(res.ToString());
                     return;
                 }
