@@ -122,7 +122,7 @@ namespace OpenFFBoardPlugin
                 var selected = SelectedBoard();
                 if (selected == null)
                 {
-                    var res = await SHMessageBox.Show("Please select a COM", "No COM selected", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Question);
+                    var res = await SHMessageBox.Show("Please select a HID", "No HID selected", System.Windows.MessageBoxButton.OKCancel, System.Windows.MessageBoxImage.Question);
                     await SHMessageBox.Show(res.ToString());
                     return;
                 }
