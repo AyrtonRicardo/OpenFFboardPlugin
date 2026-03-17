@@ -319,6 +319,9 @@ _Pvt_Extensions
 .paket/paket.exe
 paket-files/
 
+# NuGet bootstrapper
+.nuget/
+
 # FAKE - F# Make
 .fake/
 
