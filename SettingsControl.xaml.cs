@@ -1,9 +1,12 @@
-﻿using SimHub.Plugins.Styles;
+﻿using Hid.Net;
+using OpenFFBoardPlugin.DTO;
+using SimHub.Plugins;
+using SimHub.Plugins.Styles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Windows.Controls;
-using OpenFFBoardPlugin.DTO;
 
 namespace OpenFFBoardPlugin
 {
@@ -28,6 +31,7 @@ namespace OpenFFBoardPlugin
             ViewAutoConnectOnStartup.IsChecked = Plugin.Settings.AutoConnectOnStartup;
             ViewLastError.Text = "";
             ViewProfileJsonPath.Text = Plugin.Settings.ProfileJsonPath;
+            ViewPluginConfigJsonPath.Text = Plugin.GetCommonStoragePath();
 
             if (!string.IsNullOrEmpty(Plugin.Settings.ProfileJsonPath))
             {
@@ -48,9 +52,9 @@ namespace OpenFFBoardPlugin
 
         private void UpdateConnectedTo(string connectedTo)
         {
-            if (Plugin.Settings.ConnectTo != connectedTo)
+            if (Plugin.Settings.SelectedHidDeviceId != connectedTo)
             {
-                Plugin.Settings.ConnectTo = connectedTo;
+                Plugin.Settings.SelectedHidDeviceId = connectedTo;
             }
             ViewConnectedTo.Text = connectedTo;
         }
@@ -63,9 +67,11 @@ namespace OpenFFBoardPlugin
             }
 
             List<BoardText> boards = new List<BoardText>();
-            foreach (var board in Plugin.Boards)
+            for (int i = 0; i < Plugin.BoardsHid?.Length; i++)
             {
-                boards.Add(new BoardText() { Name = board, IsEnabled = Plugin.Settings.ConnectTo != null && Plugin.Settings.ConnectTo.Equals(board) } );
+                IHidDevice device = Plugin.BoardsHid[i];
+                bool isSelected = Plugin.Settings.SelectedHidDeviceId != null && Plugin.Settings.SelectedHidDeviceId.Equals(device.DeviceId);
+                boards.Add(new BoardText() { Name = device.DeviceId, DeviceIndex = i, IsEnabled = isSelected });
             }
 
             viewBoards.ItemsSource = boards;
@@ -121,7 +127,7 @@ namespace OpenFFBoardPlugin
                     return;
                 }
 
-                Plugin.ConnectToBoard(SelectedBoard().Name, Plugin.Settings.BaudRate);
+                Plugin.ConnectToBoard(SelectedBoard().DeviceIndex);
                 UpdateConnectedTo(SelectedBoard().Name);
             }
             catch (Exception ex)
@@ -253,6 +259,7 @@ namespace OpenFFBoardPlugin
     public class BoardText
     {
         public string Name { get; set; }
+        public int DeviceIndex { get; set; }
         private bool Enabled { get; set; }
 
         public bool IsEnabled

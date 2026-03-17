@@ -5,9 +5,8 @@
     /// </summary>
     public class DataPluginSettings
     {
-        public int BaudRate = 115200;
-        public string ConnectTo = null;
         public bool AutoConnectOnStartup = false;
         public string ProfileJsonPath = null;
+        public string SelectedHidDeviceId = null;
     }
 }

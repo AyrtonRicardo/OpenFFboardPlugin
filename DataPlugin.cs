@@ -1,9 +1,10 @@
 ﻿using GameReaderCommon;
+using Hid.Net;
+using OpenFFBoardPlugin.DTO;
+using OpenFFBoardPlugin.Utils;
 using SimHub.Plugins;
 using System;
 using System.Windows.Media;
-using OpenFFBoardPlugin.DTO;
-using OpenFFBoardPlugin.Utils;
 using WoteverCommon.Extensions;
 
 namespace OpenFFBoardPlugin
@@ -19,9 +20,10 @@ namespace OpenFFBoardPlugin
         }
 
         public DataPluginSettings Settings;
-        public OpenFFBoard.Serial OpenFFBoard;
-        public string[] Boards = null;
+        public OpenFFBoard.Board OpenFFBoard;
+        public IHidDevice[] BoardsHid = null;
         public string ActiveProfile = null;
+        internal const string settingsName = "OpenFFBoardPluginSettings";
 
         /// <summary>
         /// Instance of the current plugin manager
@@ -78,7 +80,12 @@ namespace OpenFFBoardPlugin
 
         public void SaveConfig()
         {
-            this.SaveCommonSettings("GeneralSettings", Settings, 5);
+            this.SaveCommonSettings(settingsName, Settings, 5);
+        }
+
+        internal string GetCommonStoragePath()
+        {
+            return PluginManager.GetCommonStoragePath(GetType().Name + "." + settingsName + ".json");
         }
 
         /// <summary>
@@ -91,14 +98,9 @@ namespace OpenFFBoardPlugin
             return new SettingsControl(this);
         }
 
-        public void ConnectToBoard(string comPort, int baudRate)
+        public void ConnectToBoard(int hidDeviceIndex = 0)
         {
-            if (string.IsNullOrEmpty(comPort))
-            {
-                return;
-            }
-
-            OpenFFBoard = new OpenFFBoard.Serial(comPort, baudRate);
+            OpenFFBoard = new OpenFFBoard.Hid(BoardsHid[hidDeviceIndex]);
             OpenFFBoard.Connect();
 
             byte mainClass = OpenFFBoard.System.GetMain();
@@ -170,7 +172,7 @@ namespace OpenFFBoardPlugin
                 return;
             }
 
-            ProfileToSerialConverter.ConvertProfileToCommands(profile, OpenFFBoard).ForEach(cmd =>
+            ProfileToCommandConverter.ConvertProfileToCommands(profile, OpenFFBoard).ForEach(cmd =>
             {
                 if (!cmd())
                 {
@@ -193,8 +195,11 @@ namespace OpenFFBoardPlugin
             // Load settings
             Settings = this.ReadCommonSettings<DataPluginSettings>("GeneralSettings", () => new DataPluginSettings());
 
-            Boards = global::OpenFFBoard.Serial.GetBoards();
-            ConnectToBoard(Settings.ConnectTo, Settings.BaudRate);
+            var task = global::OpenFFBoard.Hid.GetBoardsAsync();
+            task.Wait();
+            BoardsHid = task.Result;
+
+            ConnectToBoard();
 
             UpdateProfileDataIfConnected();
 

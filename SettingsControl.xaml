@@ -57,7 +57,7 @@
                                             <ColumnDefinition Width="100"></ColumnDefinition>
                                         </Grid.ColumnDefinitions>
 
-                                        <TextBlock Grid.Column="0"  VerticalAlignment="Center" HorizontalAlignment="Left" Text="COM Selected: " />
+                                        <TextBlock Grid.Column="0"  VerticalAlignment="Center" HorizontalAlignment="Left" Text="Device: " />
                                         <TextBlock Grid.Column="1" VerticalAlignment="Center" x:Name="ViewConnectedTo" />
                                         <styles:SHButtonPrimary Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Click="ViewSelectedCom_Connect">Connect</styles:SHButtonPrimary>
                                         <styles:SHButtonSecondary Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Left" Click="ViewSelectedCom_Disconnect">Disconnect</styles:SHButtonSecondary>
@@ -115,6 +115,8 @@
 
                                 <Grid Grid.Column="1" Margin="5, 0" >
                                     <styles:SHButtonPrimary Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Click="SaveConfiguration_Click">SAVE PLUGIN CONFIG</styles:SHButtonPrimary>
+                                    <TextBlock Grid.Row="1" Margin="0 20 0 0" VerticalAlignment="Center" Text="At: " HorizontalAlignment="Left" />
+                                    <TextBlock Grid.Row="1" Margin="20 20 0 0" VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="ViewPluginConfigJsonPath" />
                                 </Grid>
 
                                 <Grid Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5, 0">
