@@ -1,11 +1,8 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFFBoardPlugin", "OpenFFBoardPlugin.csproj", "{833040C9-FE5E-4CCF-B21D-71979E049B6B}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenFFBoardPlugin.Tests", "OpenFFBoardPlugin.Tests\OpenFFBoardPlugin.Tests.csproj", "{8F3C7A1B-9E4D-4F6C-B2A8-3D5E1F7C9B0A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +14,11 @@ Global
 		{833040C9-FE5E-4CCF-B21D-71979E049B6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{833040C9-FE5E-4CCF-B21D-71979E049B6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{833040C9-FE5E-4CCF-B21D-71979E049B6B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8F3C7A1B-9E4D-4F6C-B2A8-3D5E1F7C9B0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8F3C7A1B-9E4D-4F6C-B2A8-3D5E1F7C9B0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8F3C7A1B-9E4D-4F6C-B2A8-3D5E1F7C9B0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8F3C7A1B-9E4D-4F6C-B2A8-3D5E1F7C9B0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {306ADDE3-CED0-44CB-BC48-6A7451F6AFB1}
 	EndGlobalSection
 EndGlobal
