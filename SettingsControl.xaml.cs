@@ -168,7 +168,28 @@ namespace OpenFFBoardPlugin
                 }
             }
 
-            UpdateConnectedTo(SelectedBoard());
+            var selected = SelectedBoard();
+            UpdateConnectedTo(selected);
+
+            if (Plugin.Settings.AutoConnectOnStartup && selected != null && !Plugin.IsConnected())
+            {
+                try
+                {
+                    await Plugin.ConnectToBoardAsync(selected.DeviceIndex);
+                    UpdateConnectedTo(selected);
+
+                    var profileName = Plugin.FindProfileForCurrentGame();
+                    if (!string.IsNullOrEmpty(profileName))
+                    {
+                        await Plugin.ApplyProfileAsync(profileName);
+                        RefreshActiveProfile();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ShowError($"Auto-connect failed: {ex.Message}");
+                }
+            }
         }
 
         private void ViewBoards_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -234,7 +255,9 @@ namespace OpenFFBoardPlugin
                 }
 
                 Plugin.Disconnect();
+                Plugin.ActiveProfile = null;
                 UpdateConnectedTo(null);
+                RefreshActiveProfile();
             }
             catch (Exception ex)
             {
