@@ -4,15 +4,11 @@ name: Build Plugin
 
 on:
   push:
-    branches: [ '**' ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
   workflow_call:
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   identify-simhub-version:
@@ -50,48 +46,19 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Install OpenCover and NUnit Console Runner
-        run: |
-          nuget install OpenCover -Version 4.7.1221 -OutputDirectory packages
-          nuget install NUnit.ConsoleRunner -Version 3.18.3 -OutputDirectory packages
+      - name: Run tests with coverage and JUnit results
+        run: >
+          dotnet test OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./coverage
+          --logger "junit;LogFilePath=../test-results/junit.xml"
 
-      - name: Build test project
-        run: dotnet build OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj --configuration Release
-
-      - name: Run tests with OpenCover coverage
-        shell: powershell
-        run: |
-          $opencover = ".\packages\OpenCover.4.7.1221\tools\OpenCover.Console.exe"
-          $nunit    = ".\packages\NUnit.ConsoleRunner.3.18.3\tools\nunit3-console.exe"
-          $testDll  = "OpenFFBoardPlugin.Tests\bin\Release\net48\OpenFFBoardPlugin.Tests.dll"
-          $filter   = "+[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.* -[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.Tests.*"
-
-          & $opencover `
-            -register:user `
-            -target:"$nunit" `
-            "-targetargs:$testDll" `
-            "-filter:$filter" `
-            -output:coverage.xml `
-            -returntargetcode
-
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Debug coverage output
-        shell: powershell
-        if: always()
-        run: |
-          if (Test-Path coverage.xml) {
-            $size = (Get-Item coverage.xml).Length
-            Write-Output ('coverage.xml exists — ' + $size + ' bytes')
-            Get-Content coverage.xml | Select-Object -First 30
-          } else {
-            Write-Output 'coverage.xml was NOT generated'
-          }
-
-      - name: Upload coverage to Codecov
+      - name: Upload coverage and test results to Codecov
         uses: codecov/codecov-action@v5
         with:
-          files: ./coverage.xml
+          files: ./coverage/**/coverage.cobertura.xml
+          test_results_files: ./test-results/junit.xml
           flags: unittests
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
