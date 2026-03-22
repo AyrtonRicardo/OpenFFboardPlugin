@@ -6,6 +6,7 @@
     public class DataPluginSettings
     {
         public bool AutoConnectOnStartup = false;
+        public bool AutoApplyProfileOnGameChange = false;
         public string ProfileJsonPath = null;
         public string SelectedHidDeviceId = null;
     }

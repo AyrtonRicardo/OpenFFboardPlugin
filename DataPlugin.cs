@@ -26,6 +26,9 @@ namespace OpenFFBoardPlugin
         public string ActiveProfile = null;
         public string settingsName = "GeneralSettings";
 
+        private string _lastAutoAppliedGame = null;
+        private bool _isApplyingProfile = false;
+
         /// <summary>
         /// Instance of the current plugin manager
         /// </summary>
@@ -52,18 +55,20 @@ namespace OpenFFBoardPlugin
         /// <param name="data">Current game data, including current and previous data frame.</param>
         public void DataUpdate(PluginManager pluginManager, ref GameData data)
         {
-            // Define the value of our property (declared in init)
-            if (data.GameRunning)
+            if (!Settings.AutoApplyProfileOnGameChange || !IsConnected() || _isApplyingProfile)
+                return;
+
+            var currentGame = pluginManager?.GameManager?.GameName();
+            if (string.IsNullOrEmpty(currentGame) || currentGame == _lastAutoAppliedGame)
+                return;
+
+            _lastAutoAppliedGame = currentGame;
+
+            var profileName = FindProfileForCurrentGame();
+            if (!string.IsNullOrEmpty(profileName))
             {
-                SimHub.Logging.Current.Info("Game is running cool");
-                if (data.OldData != null && data.NewData != null)
-                {
-                   /* if (data.OldData.SpeedKmh < Settings.SpeedWarningLevel && data.OldData.SpeedKmh >= Settings.SpeedWarningLevel)
-                   {
-                        //  Trigger an event
-                       //this.TriggerEvent("SpeedWarning");
-                   } */
-                }
+                _isApplyingProfile = true;
+                _ = ApplyProfileAsync(profileName).ContinueWith(_ => _isApplyingProfile = false);
             }
         }
 

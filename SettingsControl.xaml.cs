@@ -29,6 +29,7 @@ namespace OpenFFBoardPlugin
             Plugin = plugin;
 
             ViewAutoConnectOnStartup.IsChecked = Plugin.Settings.AutoConnectOnStartup;
+            ViewAutoApplyOnGameChange.IsChecked = Plugin.Settings.AutoApplyProfileOnGameChange;
             ViewPluginConfigJsonPath.Text = Plugin.GetCommonStoragePath();
 
             var profilePath = Plugin.Settings.ProfileJsonPath;
@@ -327,6 +328,18 @@ namespace OpenFFBoardPlugin
         {
             if (Plugin != null)
                 Plugin.Settings.AutoConnectOnStartup = ViewAutoConnectOnStartup.IsChecked == true;
+        }
+
+        private void ViewAutoApplyOnGameChange_Checked(object sender, RoutedEventArgs e)
+        {
+            if (Plugin != null)
+                Plugin.Settings.AutoApplyProfileOnGameChange = true;
+        }
+
+        private void ViewAutoApplyOnGameChange_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (Plugin != null)
+                Plugin.Settings.AutoApplyProfileOnGameChange = false;
         }
     }
 

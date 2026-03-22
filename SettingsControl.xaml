@@ -179,6 +179,13 @@
                                 </styles:SHButtonSecondary>
                             </StackPanel>
 
+                            <styles:SHToggleCheckbox x:Name="ViewAutoApplyOnGameChange"
+                                                     Margin="0,10,0,0"
+                                                     Checked="ViewAutoApplyOnGameChange_Checked"
+                                                     Unchecked="ViewAutoApplyOnGameChange_Unchecked">
+                                Auto-apply profile when game changes
+                            </styles:SHToggleCheckbox>
+
                             <styles:SHSectionSeparator />
 
                             <!-- Profiles JSON file path -->
