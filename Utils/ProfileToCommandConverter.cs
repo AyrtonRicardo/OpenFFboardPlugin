@@ -54,8 +54,9 @@ namespace OpenFFBoardPlugin.Utils
                         return () => board.Axis.SetAxisdamper((byte)data.Value);
                     case "axisfriction":
                         return () => board.Axis.SetAxisfriction((byte)data.Value);
-                    case "axisinertia":
-                        return () => board.Axis.SetAxisinertia((byte)data.Value);
+                    // The descriptor for axisinertia is wrong in v4 of the lib, so we cannot use this right now.
+                    /* case "axisinertia":
+                        return () => board.Axis.SetAxisinertia((byte)data.Value);*/
                     default:
                         SimHub.Logging.Current.Error($"Unknown AXIS instance: {data.Instance}");
                         break;
