@@ -24,4 +24,8 @@
     <Compile Include="..\DTO\Profile.cs" Link="DTO\Profile.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="TestSupport\mock_json\profiles.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>
