@@ -4,7 +4,7 @@ name: Build Plugin
 
 on:
   push:
-    branches: [ main ]
+    branches: [ '**' ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -71,6 +71,18 @@ jobs:
             -returntargetcode
 
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Debug coverage output
+        shell: powershell
+        if: always()
+        run: |
+          if (Test-Path coverage.xml) {
+            $size = (Get-Item coverage.xml).Length
+            Write-Output "coverage.xml exists — $size bytes"
+            Get-Content coverage.xml | Select-Object -First 30
+          } else {
+            Write-Output "coverage.xml was NOT generated"
+          }
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5
