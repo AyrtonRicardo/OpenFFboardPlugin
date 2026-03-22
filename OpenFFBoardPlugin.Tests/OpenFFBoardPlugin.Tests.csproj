@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>OpenFFBoardPlugin.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.14.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <!--
+    Compile the pure-logic source files directly from the main project.
+    These have no WPF/HID/SimHub runtime dependencies — only Newtonsoft.Json.
+    A SimHub.Logging stub (TestSupport/SimHubStub.cs) satisfies the
+    compiler without requiring SimHub DLLs to be installed.
+  -->
+  <ItemGroup>
+    <Compile Include="..\Utils\JsonHandler.cs" Link="Utils\JsonHandler.cs" />
+    <Compile Include="..\DTO\Profile.cs" Link="DTO\Profile.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="TestSupport\mock_json\profiles.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
