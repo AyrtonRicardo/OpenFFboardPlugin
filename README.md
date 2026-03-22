@@ -11,7 +11,6 @@ A SimHub plugin that connects [OpenFFBoard](https://github.com/Ultrawipf/OpenFFB
 - **Per-game profiles** — stores FFB settings in a `profiles.json` file; the correct profile is automatically applied when SimHub detects a game change
 - **Profile management** — create a new profile for the current game (cloned from the Default profile) or apply an existing one to the board with dedicated buttons
 - **Graceful fallback** — if no profile exists for the current game, no changes are sent to the board
-- **Robust JSON parsing** — tolerates `{}` (empty object) instead of `[]` (empty array) in the profiles file; safe to use hand-edited JSON
 
 ## Supported FFB commands
 
