@@ -86,7 +86,7 @@
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="OpenFFBSharp, Version=0.3.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="OpenFFBSharp, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>lib\OpenFFBSharp.dll</HintPath>
     </Reference>
@@ -199,7 +199,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY /Y /R "$(TargetDir)\$(TargetName)*" "%25SIMHUB_INSTALL_PATH%25"</PostBuildEvent>
+    <PostBuildEvent>XCOPY /Y /R "$(TargetDir)OpenFFB*" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Hid.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Device.Net.dll" "$(SIMHUB_INSTALL_PATH)"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
+using System.Text.RegularExpressions;
 using System.Windows.Controls;
 
 namespace OpenFFBoardPlugin
@@ -50,28 +51,50 @@ namespace OpenFFBoardPlugin
             return "NOT CONNECTED";
         }
 
-        private void UpdateConnectedTo(string connectedTo)
+        private void UpdateConnectedTo(BoardText board)
         {
-            if (Plugin.Settings.SelectedHidDeviceId != connectedTo)
+            var deviceId = board?.DeviceId;
+            if (Plugin.Settings.SelectedHidDeviceId != deviceId)
             {
-                Plugin.Settings.SelectedHidDeviceId = connectedTo;
+                Plugin.Settings.SelectedHidDeviceId = deviceId;
             }
-            ViewConnectedTo.Text = connectedTo;
+            ViewConnectedTo.Text = board?.Name ?? "";
         }
 
-        private void ViewBoards_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        private static string FormatDeviceName(IHidDevice device, int index)
+        {
+            var def = device.ConnectedDeviceDefinition;
+            if (def != null && !string.IsNullOrWhiteSpace(def.ProductName))
+            {
+                var name = def.ProductName.Trim();
+                return name;
+            }
+
+            if (def != null && def.VendorId.HasValue && def.ProductId.HasValue)
+                return $"OpenFFBoard VID:0x{def.VendorId.Value:X4} PID:0x{def.ProductId.Value:X4}";
+
+            var match = Regex.Match(device.DeviceId ?? "", @"VID_([0-9A-Fa-f]{4}).*?PID_([0-9A-Fa-f]{4})");
+            if (match.Success)
+                return $"OpenFFBoard VID:0x{match.Groups[1].Value.ToUpper()} PID:0x{match.Groups[2].Value.ToUpper()}";
+
+            return $"OpenFFBoard #{index + 1}";
+        }
+
+        private async void ViewBoards_Loaded(object sender, System.Windows.RoutedEventArgs e)
         {
             if (Plugin == null)
             {
                 return;
             }
 
+            await Plugin.RefreshBoardsAsync();
+
             List<BoardText> boards = new List<BoardText>();
             for (int i = 0; i < Plugin.BoardsHid?.Length; i++)
             {
                 IHidDevice device = Plugin.BoardsHid[i];
                 bool isSelected = Plugin.Settings.SelectedHidDeviceId != null && Plugin.Settings.SelectedHidDeviceId.Equals(device.DeviceId);
-                boards.Add(new BoardText() { Name = device.DeviceId, DeviceIndex = i, IsEnabled = isSelected });
+                boards.Add(new BoardText() { Name = FormatDeviceName(device, i), DeviceId = device.DeviceId, DeviceIndex = i, IsEnabled = isSelected });
             }
 
             viewBoards.ItemsSource = boards;
@@ -85,7 +108,7 @@ namespace OpenFFBoardPlugin
                 }
             }
 
-            UpdateConnectedTo(SelectedBoard()?.Name);
+            UpdateConnectedTo(SelectedBoard());
         }
 
         private void ViewBoards_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -127,8 +150,15 @@ namespace OpenFFBoardPlugin
                     return;
                 }
 
-                Plugin.ConnectToBoard(SelectedBoard().DeviceIndex);
-                UpdateConnectedTo(SelectedBoard().Name);
+                await Plugin.ConnectToBoardAsync(SelectedBoard().DeviceIndex);
+                UpdateConnectedTo(SelectedBoard());
+
+                var profileName = Plugin.FindProfileForCurrentGame();
+                if (!string.IsNullOrEmpty(profileName))
+                {
+                    await Plugin.ApplyProfileAsync(profileName);
+                    ViewCurrentActiveProfile.Text = Plugin.ActiveProfile ?? "";
+                }
             }
             catch (Exception ex)
             {
@@ -152,6 +182,7 @@ namespace OpenFFBoardPlugin
                 }
 
                 Plugin.Disconnect();
+                UpdateConnectedTo(null);
             }
             catch (Exception ex)
             {
@@ -177,30 +208,45 @@ namespace OpenFFBoardPlugin
             
         }
 
-        private async void SetProfileToCurrentGame_Click(object sender, System.Windows.RoutedEventArgs e)
+        private async void CreateProfileForCurrentGame_Click(object sender, System.Windows.RoutedEventArgs e)
         {
             if (Plugin == null || Plugin.PluginManager == null || Plugin.PluginManager.GameManager == null)
             {
-                await SHMessageBox.Show("No data identified, cannot set profile.");
+                await SHMessageBox.Show("No data identified, cannot create profile.");
                 return;
             }
 
-            if (Plugin.PluginManager.GameManager.GameName() == "")
+            if (string.IsNullOrEmpty(Plugin.PluginManager.GameManager.GameName()))
             {
-                await SHMessageBox.Show("No game detected, cannot set profile");
+                await SHMessageBox.Show("No game detected, cannot create profile");
                 return;
             }
+
+            var created = Plugin.CreateProfileForCurrentGame();
+            if (created != null)
+                ViewCurrentActiveProfile.Text = created;
+        }
+
+        private async void ApplyCurrentProfile_Click(object sender, System.Windows.RoutedEventArgs e)
+        {
+            if (Plugin == null)
+                return;
 
             if (!Plugin.IsConnected())
             {
-                await SHMessageBox.Show("No board connected, cannot set profile");
+                await SHMessageBox.Show("No board connected, cannot apply profile");
                 return;
             }
 
-            var gameName = Plugin.PluginManager.GameManager.GameName();
+            var profileName = Plugin.ActiveProfile;
+            if (string.IsNullOrEmpty(profileName))
+            {
+                await SHMessageBox.Show("No profile selected. Create a profile first.");
+                return;
+            }
 
-            ViewCurrentActiveProfile.Text = gameName;
-            Plugin.UpdateProfileDataIfConnected();
+            await Plugin.ApplyProfileAsync(profileName);
+            ViewCurrentActiveProfile.Text = Plugin.ActiveProfile;
         }
 
         private void ErrorHasHappened(string error)
@@ -259,6 +305,7 @@ namespace OpenFFBoardPlugin
     public class BoardText
     {
         public string Name { get; set; }
+        public string DeviceId { get; set; }
         public int DeviceIndex { get; set; }
         private bool Enabled { get; set; }
 
