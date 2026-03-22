@@ -46,38 +46,22 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Install OpenCover
-        run: choco install opencover.portable -y
+      - name: Run tests with coverage and JUnit results
+        run: >
+          dotnet test OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./coverage
+          --logger "junit;LogFilePath=../test-results/junit.xml"
 
-      - name: Build test project
-        run: dotnet build OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj --configuration Release
-
-      - name: Run tests with OpenCover coverage
-        shell: powershell
-        run: |
-          New-Item -ItemType Directory -Force -Path test-results | Out-Null
-          $junitPath = "$env:GITHUB_WORKSPACE\test-results\junit.xml"
-          $targetArgs = "test OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj --configuration Release --no-build --logger `"junit;LogFilePath=$junitPath`""
-          $filter = "+[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.* -[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.Tests.*"
-
-          & OpenCover.Console.exe `
-            -register:user `
-            -target:"dotnet.exe" `
-            "-targetargs:$targetArgs" `
-            "-filter:$filter" `
-            -output:coverage.xml `
-            -returntargetcode
-
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Upload coverage and test results to Codecov
+        uses: codecov/codecov-action@v5
         with:
-          files: ./coverage.xml
+          files: ./coverage/**/coverage.cobertura.xml
+          test_results_files: ./test-results/junit.xml
           flags: unittests
           fail_ci_if_error: false
-        env:
-          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   build:
     runs-on: windows-latest
