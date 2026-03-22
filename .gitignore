@@ -13,6 +13,7 @@
 *.user
 *.userosscache
 *.sln.docstates
+.claude/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
@@ -318,6 +319,9 @@ _Pvt_Extensions
 # Paket dependency manager
 .paket/paket.exe
 paket-files/
+
+# NuGet bootstrapper
+.nuget/
 
 # FAKE - F# Make
 .fake/
