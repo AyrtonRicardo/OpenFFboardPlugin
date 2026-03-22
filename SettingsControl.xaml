@@ -1,273 +1,261 @@
-﻿<UserControl x:Class="OpenFFBoardPlugin.SettingsControl" 
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-             xmlns:converter="http://metro.mahapps.com/winfx/xaml/iconpacks" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:iconpacks="clr-namespace:MahApps.Metro.IconPacks;assembly=MahApps.Metro.IconPacks.Material" 
-             xmlns:local="clr-namespace:OpenFFBoardPlugin" 
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins" 
-             xmlns:ui="clr-namespace:SimHub.Plugins.UI;assembly=SimHub.Plugins" 
+<UserControl x:Class="OpenFFBoardPlugin.SettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins"
              mc:Ignorable="d">
-    <UserControl.Resources>
-        <!-- Define the BooleanToVisibilityConverter as a resource -->
-        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-    </UserControl.Resources>
 
-    <ScrollViewer>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="0*" />
-            </Grid.ColumnDefinitions>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,12,16">
 
-            <styles:SHSection Title="Settings WIP BOES WIP VERY WIP" Grid.ColumnSpan="2" ShowSeparator="True">
+            <styles:SHSection Title="OpenFFBoard Companion" ShowSeparator="True">
                 <StackPanel>
-                    <styles:SHSubSection Title="Connection" Height="207">
-                        <Grid>
-                            <Grid HorizontalAlignment="Left">
+
+                    <!-- ═══ CONNECTION ═══════════════════════════════════════════════ -->
+                    <styles:SHSubSection Title="Connection">
+                        <StackPanel>
+
+                            <!-- Status row: indicator dot · board name · action buttons -->
+                            <Grid Margin="0,4,0,0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
+                                    <ColumnDefinition Width="12" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" VerticalAlignment="Top" Text="Last error: " Grid.ColumnSpan="2" Margin="0,121,0,0" />
-                                <TextBlock Grid.Column="1" VerticalAlignment="Top" x:Name="ViewLastError" Foreground="Red" Height="28" Margin="28,115,-323,0" />
+                                <Ellipse Grid.Column="0"
+                                         x:Name="ViewConnectionDot"
+                                         Width="10" Height="10"
+                                         Fill="#888888"
+                                         VerticalAlignment="Center" />
+
+                                <TextBlock Grid.Column="1"
+                                           x:Name="ViewConnectedTo"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,0,0"
+                                           Text="Not connected"
+                                           FontStyle="Italic"
+                                           Opacity="0.6" />
+
+                                <styles:SHButtonPrimary Grid.Column="2"
+                                                        Click="ViewSelectedCom_Connect"
+                                                        Margin="0,0,6,0"
+                                                        VerticalAlignment="Center">
+                                    Connect
+                                </styles:SHButtonPrimary>
+
+                                <styles:SHButtonSecondary Grid.Column="3"
+                                                          Click="ViewSelectedCom_Disconnect"
+                                                          VerticalAlignment="Center">
+                                    Disconnect
+                                </styles:SHButtonSecondary>
                             </Grid>
 
-                            <Grid HorizontalAlignment="Left">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="380"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                    <ColumnDefinition Width="*"></ColumnDefinition>
-                                </Grid.ColumnDefinitions>
+                            <!-- Available boards list -->
+                            <TextBlock Text="Available devices"
+                                       Margin="0,12,0,4"
+                                       Opacity="0.55"
+                                       FontSize="11" />
 
-                                <Grid Grid.Column="0" Margin="5, 0" >
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"></RowDefinition>
-                                        <RowDefinition Height="*"></RowDefinition>
-                                        <RowDefinition Height="*"></RowDefinition>
-                                    </Grid.RowDefinitions>
-
-                                    <Grid Grid.Row="0">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150"></ColumnDefinition>
-                                            <ColumnDefinition Width="60"></ColumnDefinition>
-                                            <ColumnDefinition Width="90"></ColumnDefinition>
-                                            <ColumnDefinition Width="50"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-
-                                        <TextBlock Grid.Column="0"  VerticalAlignment="Center" HorizontalAlignment="Left" Height="34" >
-                                            <Run Text="Connected"/>
-                                            <LineBreak/>
-                                            <Run Text="To: "/>
-                                        </TextBlock>
-                                        <TextBlock VerticalAlignment="Center" x:Name="ViewConnectedTo" Grid.ColumnSpan="2" Margin="77,0,10,0" />
-                                        <styles:SHButtonPrimary VerticalAlignment="Top" HorizontalAlignment="Left" Click="ViewSelectedCom_Connect" Height="10" Margin="0,0,0,0" Width="90" FontSize="9" Grid.RowSpan="1" Grid.ColumnSpan="1" Grid.Column="2">CONNECT</styles:SHButtonPrimary>
-                                        <styles:SHButtonSecondary Grid.Column="2" VerticalAlignment="Top" HorizontalAlignment="Left" Click="ViewSelectedCom_Disconnect" Height="16" Margin="0,27,0,0" FontSize="9" Width="90">DISCONNECT</styles:SHButtonSecondary>
-                                    </Grid>
-
-                                    <Grid Grid.Row="1" Margin="0,2">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"></RowDefinition>
-                                            <RowDefinition Height="*"></RowDefinition>
-                                        </Grid.RowDefinitions>
-
-                                        <Grid Grid.Row="0">
+                            <ListBox x:Name="viewBoards"
+                                     Loaded="ViewBoards_Loaded"
+                                     SelectionChanged="ViewBoards_SelectionChanged"
+                                     HorizontalContentAlignment="Stretch"
+                                     MaxHeight="120">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,3">
                                             <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="230"></ColumnDefinition>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
-                                            <ListBox Grid.Column="0"
-                                             Name="viewBoards" 
-                                             HorizontalContentAlignment="Stretch" 
-                                             Loaded="ViewBoards_Loaded" 
-                                             SelectionChanged="ViewBoards_SelectionChanged" Margin="0,0,-8,-25">
-                                                <ListBox.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Grid Margin="0,2">
-                                                            <Grid.ColumnDefinitions>
-                                                                <ColumnDefinition Width="*" />
-                                                                <ColumnDefinition Width="100" />
-                                                            </Grid.ColumnDefinitions>
-                                                            <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="{Binding Name}" />
-                                                            <Label Grid.Column="1" Content="Connected">
-                                                                <Label.Style>
-                                                                    <Style TargetType="Label">
-                                                                        <Setter Property="Visibility" Value="Hidden"/>
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding IsEnabled}" Value="True">
-                                                                                <Setter Property="Visibility" Value="Visible"/>
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </Label.Style>
-                                                            </Label>
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </ListBox.ItemTemplate>
-                                            </ListBox>
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding Name}"
+                                                       VerticalAlignment="Center" />
+
+                                            <StackPanel Grid.Column="1"
+                                                        Orientation="Horizontal"
+                                                        VerticalAlignment="Center">
+                                                <Ellipse Width="8" Height="8"
+                                                         Fill="#4CAF50"
+                                                         Margin="0,0,4,0">
+                                                    <Ellipse.Style>
+                                                        <Style TargetType="Ellipse">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Ellipse.Style>
+                                                </Ellipse>
+                                                <TextBlock Text="connected"
+                                                           Foreground="#4CAF50"
+                                                           FontSize="11">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsEnabled}" Value="True">
+                                                                    <Setter Property="Visibility" Value="Visible" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </StackPanel>
                                         </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
 
-                                        <Grid Grid.Row="1" Margin="0,33,0,-32">
-                                            <styles:SHToggleCheckbox x:Name="ViewAutoConnectOnStartup" Checked="ViewAutoConnectOnStartup_Checked" Unchecked="ViewAutoConnectOnStartup_Unchecked" Margin="-2,25,10,-18">
-                                                Auto Connect on StartUp
-                                            </styles:SHToggleCheckbox>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
+                            <styles:SHToggleCheckbox x:Name="ViewAutoConnectOnStartup"
+                                                     Margin="0,10,0,0"
+                                                     Checked="ViewAutoConnectOnStartup_Checked"
+                                                     Unchecked="ViewAutoConnectOnStartup_Unchecked">
+                                Auto-connect on startup
+                            </styles:SHToggleCheckbox>
 
-                                <Grid Grid.Column="1" Margin="5, 0" >
-                                    <styles:SHButtonPrimary Grid.Row="0" VerticalAlignment="Top" HorizontalAlignment="Left" Click="SaveConfiguration_Click">SAVE PLUGIN CONFIG</styles:SHButtonPrimary>
-                                    <TextBlock Grid.Row="1" Margin="0 40 0 0" VerticalAlignment="Top" Text="At: " HorizontalAlignment="Left" />
-                                    <TextBlock Grid.Row="1" Margin="20 40 0 0" VerticalAlignment="Top" HorizontalAlignment="Left" x:Name="ViewPluginConfigJsonPath" />
-                                </Grid>
+                            <!-- Inline error message (hidden when empty) -->
+                            <TextBlock x:Name="ViewLastError"
+                                       Foreground="#E53935"
+                                       TextWrapping="Wrap"
+                                       Margin="0,8,0,0"
+                                       Visibility="Collapsed" />
 
-                                <Grid Grid.Column="2" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5, 0">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="*"></RowDefinition>
-                                        <RowDefinition Height="*"></RowDefinition>
-                                    </Grid.RowDefinitions>
-
-                                    <styles:SHButtonPrimary Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Click="SelectProfileJsonPath_Click">
-                                        Select Profile JSON Path
-                                    </styles:SHButtonPrimary>
-
-                                    <Grid Grid.Row="0">
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"></RowDefinition>
-                                            <RowDefinition Height="*"></RowDefinition>
-                                        </Grid.RowDefinitions>
-
-                                        <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Selected Profile path: " />
-                                        <TextBlock Grid.Row="1" VerticalAlignment="Center" TextWrapping="Wrap" HorizontalAlignment="Left" x:Name="ViewProfileJsonPath" Text="N/A" />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
+                        </StackPanel>
                     </styles:SHSubSection>
+
                     <styles:SHSectionSeparator />
 
-                    <styles:SHSubSection Title="Profile Data Visualization" Height="233">
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                            </Grid.RowDefinitions>
+                    <!-- ═══ PROFILE MANAGEMENT ════════════════════════════════════════ -->
+                    <styles:SHSubSection Title="Profile Management">
+                        <StackPanel>
 
-                            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                                <styles:SHButtonPrimary VerticalAlignment="Center" HorizontalAlignment="Left" Click="CreateProfileForCurrentGame_Click">Create profile for current game</styles:SHButtonPrimary>
-                                <styles:SHButtonSecondary Margin="8,0,0,0" VerticalAlignment="Center" HorizontalAlignment="Left" Click="ApplyCurrentProfile_Click">Apply profile to board</styles:SHButtonSecondary>
+                            <!-- Current state info: game + active profile -->
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0"
+                                           Text="Current game:"
+                                           Opacity="0.55"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Row="0" Grid.Column="1"
+                                           x:Name="ViewCurrentGame"
+                                           Text="—"
+                                           VerticalAlignment="Center" />
+
+                                <TextBlock Grid.Row="1" Grid.Column="0"
+                                           Text="Active profile:"
+                                           Opacity="0.55"
+                                           VerticalAlignment="Center"
+                                           Margin="0,6,0,0" />
+                                <TextBlock Grid.Row="1" Grid.Column="1"
+                                           x:Name="ViewCurrentActiveProfile"
+                                           Text="—"
+                                           VerticalAlignment="Center"
+                                           Margin="0,6,0,0" />
+                            </Grid>
+
+                            <!-- Profile action buttons -->
+                            <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                <styles:SHButtonPrimary Click="CreateProfileForCurrentGame_Click">
+                                    Create profile for current game
+                                </styles:SHButtonPrimary>
+                                <styles:SHButtonSecondary Margin="8,0,0,0"
+                                                          Click="ApplyCurrentProfile_Click">
+                                    Apply profile to board
+                                </styles:SHButtonSecondary>
                             </StackPanel>
 
-                            <Grid Grid.Row="1" Margin="0,2">
+                            <styles:SHToggleCheckbox x:Name="ViewAutoApplyOnGameChange"
+                                                     Margin="0,10,0,0"
+                                                     Checked="ViewAutoApplyOnGameChange_Checked"
+                                                     Unchecked="ViewAutoApplyOnGameChange_Unchecked">
+                                Auto-apply profile when game changes
+                            </styles:SHToggleCheckbox>
+
+                            <styles:SHSectionSeparator />
+
+                            <!-- Profiles JSON file path -->
+                            <Grid Margin="0,4,0,0">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="Profiles file:"
+                                           Opacity="0.55"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           x:Name="ViewProfileJsonPath"
+                                           Text="Not configured"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"
+                                           ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
+                                <styles:SHButtonSecondary Grid.Column="2"
+                                                          Margin="8,0,0,0"
+                                                          Click="SelectProfileJsonPath_Click">
+                                    Browse…
+                                </styles:SHButtonSecondary>
+                            </Grid>
+
+                            <TextBlock x:Name="ViewProfileCount"
+                                       Opacity="0.5"
+                                       FontSize="11"
+                                       Margin="110,3,0,0" />
+
+                        </StackPanel>
+                    </styles:SHSubSection>
+
+                    <styles:SHSectionSeparator />
+
+                    <!-- ═══ PLUGIN SETTINGS ══════════════════════════════════════════ -->
+                    <styles:SHSubSection Title="Plugin Settings">
+                        <StackPanel>
+
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
 
-                                <TextBlock Grid.Column="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="Profile loaded: " />
-                                <TextBlock Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Left" x:Name="ViewCurrentActiveProfile" Text="No profile match" >No profile loaded yet</TextBlock>
+                                <TextBlock Grid.Column="0"
+                                           Text="Settings file:"
+                                           Opacity="0.55"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           x:Name="ViewPluginConfigJsonPath"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"
+                                           ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
                             </Grid>
 
-                            <TextBlock Grid.Row="2" HorizontalAlignment="Left" x:Name="ViewProfileData" />
-                        </Grid>
+                            <styles:SHButtonPrimary HorizontalAlignment="Left"
+                                                    Margin="0,10,0,0"
+                                                    Click="SaveConfiguration_Click">
+                                Save settings
+                            </styles:SHButtonPrimary>
+
+                        </StackPanel>
                     </styles:SHSubSection>
 
-
-                    <styles:SHSubSection Title="Current Game Specific Settings" Margin="0 50 0 0">
-                        <Grid HorizontalAlignment="Left">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                                <RowDefinition Height="*"></RowDefinition>
-                            </Grid.RowDefinitions>
-
-                            <TextBlock Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Left" Text="This section I imagine to have some settings per game, like auto-range which for some games is necessary."/>
-                        </Grid>
-                    </styles:SHSubSection>
-
-                    <styles:SHSubSection Title="Remember" Margin="0 100 0 0">
-                        <Label>WIP Got it?</Label>
-                    </styles:SHSubSection>
-
-                    <!--  OVERALL DESIGN OPTIONS BELOW
-                    The options below are examples using Simhub designs. Should be used as basis in case of new fields are added to the interface.
-                    
-                    <styles:SHButtonPrimary HorizontalAlignment="Left">Primary button</styles:SHButtonPrimary>
-                    <styles:SHButtonSecondary HorizontalAlignment="Left">Secondary button</styles:SHButtonSecondary>
-
-                    
-                    <styles:SHButtonPrimary x:Name="ConnectBtn" Click="ConnectBtn_Click" Content="Connect" ToolTip="Connect simHub to your Skinetic vest"/>-->
-
-                    <!-- <styles:SHLinkButton HorizontalAlignment="Left">Link button</styles:SHLinkButton>
-
-                    <styles:SHLinkButtonSmall HorizontalAlignment="Left">Link button small</styles:SHLinkButtonSmall>
-
-                    <ui:ControlsEditor ActionName="DataPluginDemo.IncrementSpeedWarning" FriendlyName="Increment Speed Warning" />
-                    <ui:ControlsEditor ActionName="DataPluginDemo.InputPressed" FriendlyName="Button mapping" />
-
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHSubSection Title="Subsection">
-                        <Label>Subsection content</Label>
-                    </styles:SHSubSection>
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHToggleCheckbox>
-                        Hello
-                    </styles:SHToggleCheckbox>
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHTabControl>
-                        <styles:SHTabItem Header="Tab1" />
-                        <styles:SHTabItem Header="Tab2" />
-                        <styles:SHTabItem Header="Tab3" />
-                    </styles:SHTabControl>
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHListBox>
-                        <ListBoxItem>Hello 1</ListBoxItem>
-                        <ListBoxItem>Hello 2</ListBoxItem>
-                        <ListBoxItem>Hello 3</ListBoxItem>
-                    </styles:SHListBox>
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHExpander>
-                        <styles:SHExpander.Header>
-                            Expander
-                        </styles:SHExpander.Header>
-                        Hello 2
-                    </styles:SHExpander>
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHTitledGroup Title="Titled group">
-                        Titled group content
-                    </styles:SHTitledGroup>
-                    <styles:SHSectionSeparator />
-
-                    <ui:TitledSlider Title="hello" Maximum="100" Minimum="0" Value="50" />
-
-                    <ui:TitledRangeSlider Title="hello" LowerValue="50" Maximum="100" Minimum="0" UpperValue="70" />
-
-                    <styles:SHSectionSeparator />
-
-                    <ui:TitledSlider Title="hello" IsChecked="false" Maximum="100" Minimum="0" ShowCheckbox="True" Value="50" />
-
-                    <styles:SHSectionSeparator />
-
-                    <styles:SHButtonPrimary Click="StyledMessageBox_Click">Show styled messagebox</styles:SHButtonPrimary>
-                    <styles:SHButtonPrimary Click="DemoWindow_Click">Open new window</styles:SHButtonPrimary>
-                    <styles:SHButtonPrimary Click="DemodialogWindow_Click">Open dialog window</styles:SHButtonPrimary>
-
-                    <styles:SHSectionSeparator />
-                    <iconpacks:PackIconMaterial Width="40" Height="40" Kind="Plus" />
--->
                 </StackPanel>
             </styles:SHSection>
-        </Grid>
+
+        </StackPanel>
     </ScrollViewer>
 </UserControl>
