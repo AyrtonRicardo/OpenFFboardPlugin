@@ -35,6 +35,33 @@ jobs:
           echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
           echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
 
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - name: Run tests with coverage
+        run: >
+          dotnet test OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          directory: ./coverage
+          flags: unittests
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   build:
     runs-on: windows-latest
 
@@ -65,7 +92,7 @@ jobs:
 
     - name: Install SimHub # Used to download the SimHub DLLs - only if not in cache.
       if: steps.cache.outputs.cache-hit != 'true'
-      run: | 
+      run: |
         aria2c -j1 -o SimHubSetup.${{ needs.identify-simhub-version.outputs.latest_tag }}.zip "${{ needs.identify-simhub-version.outputs.download_url }}"
         7z x SimHubSetup.${{ needs.identify-simhub-version.outputs.latest_tag }}.zip -y
 
@@ -96,10 +123,15 @@ jobs:
     - name: Build
       run: msbuild OpenFFBoardPlugin.sln /p:Configuration=Release
 
-    - name: Zip output DLL file
+    - name: Zip output DLL files
       run: |
         dir ./bin/Release/
-        Compress-Archive -Path ./bin/Release/OpenFFBoardPlugin.dll,./bin/Release/OpenFFBSharp.dll -DestinationPath ./OpenFFBoardPlugin.zip
+        Compress-Archive -Path `
+          ./bin/Release/OpenFFBoardPlugin.dll, `
+          ./bin/Release/OpenFFBSharp.dll, `
+          ./bin/Release/Hid.Net.dll, `
+          ./bin/Release/Device.Net.dll `
+          -DestinationPath ./OpenFFBoardPlugin.zip
 
     - name: Upload artifact
       id: artifact-upload-step
