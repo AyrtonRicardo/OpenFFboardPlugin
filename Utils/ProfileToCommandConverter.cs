@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using OpenFFBoardPlugin.DTO;
 
 namespace OpenFFBoardPlugin.Utils
 {
-    internal class ProfileToSerialConverter
+    internal class ProfileToCommandConverter
     {
         internal OpenFFBoard.Commands.FX fx = null;
         internal OpenFFBoard.Commands.FX axis = null;
@@ -35,7 +35,7 @@ namespace OpenFFBoardPlugin.Utils
                         break;
                 }
             }
-            
+
             if (data.Cls == "axis")
             {
                 switch (data.Cmd)
@@ -52,10 +52,10 @@ namespace OpenFFBoardPlugin.Utils
                         return () => board.Axis.SetIdlespring((byte)data.Value);
                     case "axisdamper":
                         return () => board.Axis.SetAxisdamper((byte)data.Value);
-                    /* case "axisfriction":
+                    case "axisfriction":
                         return () => board.Axis.SetAxisfriction((byte)data.Value);
                     case "axisinertia":
-                        return () => board.Axis.SetAxisinertia((byte)data.Value); */
+                        return () => board.Axis.SetAxisinertia((byte)data.Value);
                     default:
                         SimHub.Logging.Current.Error($"Unknown AXIS instance: {data.Instance}");
                         break;

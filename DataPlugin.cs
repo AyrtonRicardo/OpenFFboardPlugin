@@ -1,9 +1,11 @@
 ﻿using GameReaderCommon;
-using SimHub.Plugins;
-using System;
-using System.Windows.Media;
+using Hid.Net;
 using OpenFFBoardPlugin.DTO;
 using OpenFFBoardPlugin.Utils;
+using SimHub.Plugins;
+using System;
+using System.Threading.Tasks;
+using System.Windows.Media;
 using WoteverCommon.Extensions;
 
 namespace OpenFFBoardPlugin
@@ -19,9 +21,10 @@ namespace OpenFFBoardPlugin
         }
 
         public DataPluginSettings Settings;
-        public OpenFFBoard.Serial OpenFFBoard;
-        public string[] Boards = null;
+        public OpenFFBoard.Board OpenFFBoard;
+        public IHidDevice[] BoardsHid = null;
         public string ActiveProfile = null;
+        public string settingsName = "GeneralSettings";
 
         /// <summary>
         /// Instance of the current plugin manager
@@ -78,7 +81,12 @@ namespace OpenFFBoardPlugin
 
         public void SaveConfig()
         {
-            this.SaveCommonSettings("GeneralSettings", Settings, 5);
+            this.SaveCommonSettings(settingsName, Settings, 5);
+        }
+
+        internal string GetCommonStoragePath()
+        {
+            return PluginManager.GetCommonStoragePath(GetType().Name + "." + settingsName + ".json");
         }
 
         /// <summary>
@@ -91,22 +99,47 @@ namespace OpenFFBoardPlugin
             return new SettingsControl(this);
         }
 
-        public void ConnectToBoard(string comPort, int baudRate)
+        public async Task RefreshBoardsAsync()
         {
-            if (string.IsNullOrEmpty(comPort))
+            var devices = await global::OpenFFBoard.Hid.GetBoardsAsync().ConfigureAwait(false);
+
+            if (devices != null)
             {
-                return;
+                foreach (var device in devices)
+                {
+                    try
+                    {
+                        if (!device.IsInitialized)
+                        {
+                            await device.InitializeAsync().ConfigureAwait(false);
+                            device.Close();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        SimHub.Logging.Current.Warn($"Could not read descriptor for {device.DeviceId}: {ex.Message}");
+                    }
+                }
             }
 
-            OpenFFBoard = new OpenFFBoard.Serial(comPort, baudRate);
-            OpenFFBoard.Connect();
+            BoardsHid = devices;
+        }
 
-            byte mainClass = OpenFFBoard.System.GetMain();
-
-            if (!Enum.IsDefined(typeof(AcceptableMainClassEnum), (int)mainClass))
+        public async Task ConnectToBoardAsync(int hidDeviceIndex = 0)
+        {
+            await Task.Run(() =>
             {
-                throw new Exception($"Incompatible board main class {mainClass}");
-            }
+                OpenFFBoard = new OpenFFBoard.Hid(BoardsHid[hidDeviceIndex]);
+                OpenFFBoard.Connect();
+
+                byte mainClass = OpenFFBoard.System.GetMain();
+
+                if (!Enum.IsDefined(typeof(AcceptableMainClassEnum), (int)mainClass))
+                {
+                    SimHub.Logging.Current.Error($"Incompatible board main class {mainClass}");
+                    throw new Exception($"Incompatible board main class {mainClass}");
+                }
+            });
         }
 
         public bool IsConnected()
@@ -144,41 +177,96 @@ namespace OpenFFBoardPlugin
             return null;
         }
 
-        internal void UpdateProfileDataIfConnected()
+        /// <summary>
+        /// Returns the profile name for the current game if one exists, otherwise null.
+        /// Never creates anything.
+        /// </summary>
+        internal string FindProfileForCurrentGame()
         {
-            if (!OpenFFBoard.IsConnected || string.IsNullOrEmpty(PluginManager?.GameManager?.GameName()))
-            {
-                return;
-            }
+            var gameName = PluginManager?.GameManager?.GameName();
+            if (string.IsNullOrEmpty(gameName))
+                return null;
 
-            // TODO: do not ship debug mode
-            OpenFFBoard.System.SetDebug(true);
+            var profileHolder = LoadProfileData();
+            return profileHolder?.Profiles?
+                .Find(p => p.Name.Equals(gameName, StringComparison.InvariantCultureIgnoreCase))
+                ?.Name;
+        }
 
-            var gameName = PluginManager.GameManager.GameName();
+        /// <summary>
+        /// Creates a profile entry for the current game if one doesn't exist yet,
+        /// cloning the "default" profile as the starting point. Saves profiles.json.
+        /// Does NOT send any commands to the board.
+        /// </summary>
+        internal string CreateProfileForCurrentGame()
+        {
+            var gameName = PluginManager?.GameManager?.GameName();
+            if (string.IsNullOrEmpty(gameName))
+                return null;
+
+            var profilePath = Settings.ProfileJsonPath + "\\profiles.json";
 
             ProfileHolder profileHolder = LoadProfileData();
-            if (profileHolder == null || profileHolder.Profiles == null || profileHolder.Profiles.Count == 0)
+            if (profileHolder == null)
             {
-                SimHub.Logging.Current.Warn("No profiles found");
+                SimHub.Logging.Current.Warn("No profile data loaded — check profile JSON path in settings");
+                return null;
+            }
+
+            bool alreadyExists = profileHolder.Profiles != null &&
+                profileHolder.Profiles.Exists(p => p.Name.Equals(gameName, StringComparison.InvariantCultureIgnoreCase));
+
+            var profile = profileHolder.GetOrCreateProfileForGame(gameName);
+
+            if (!alreadyExists)
+            {
+                profileHolder.SaveToJson(profilePath);
+                SimHub.Logging.Current.Info($"Created new profile for '{gameName}' based on default");
+            }
+            else
+            {
+                SimHub.Logging.Current.Info($"Profile for '{gameName}' already exists, nothing created");
+            }
+
+            return profile.Name;
+        }
+
+        /// <summary>
+        /// Sends the commands from the named profile to the board.
+        /// </summary>
+        internal async Task ApplyProfileAsync(string profileName)
+        {
+            if (!IsConnected())
+                return;
+
+            if (string.IsNullOrEmpty(profileName))
+                return;
+
+            ProfileHolder profileHolder = LoadProfileData();
+            if (profileHolder == null)
+            {
+                SimHub.Logging.Current.Warn("No profile data loaded — check profile JSON path in settings");
                 return;
             }
 
-            var profile = profileHolder.Profiles.Find(p => p.Name.Equals(gameName, StringComparison.InvariantCultureIgnoreCase));
+            var profile = profileHolder.Profiles?.Find(p => p.Name.Equals(profileName, StringComparison.InvariantCultureIgnoreCase));
             if (profile == null)
             {
-                SimHub.Logging.Current.Warn($"No profile found for game {gameName}");
+                SimHub.Logging.Current.Warn($"Profile '{profileName}' not found");
                 return;
             }
 
-            ProfileToSerialConverter.ConvertProfileToCommands(profile, OpenFFBoard).ForEach(cmd =>
-            {
-                if (!cmd())
-                {
-                    SimHub.Logging.Current.Error("Failed to execute command");
-                }
-            });
-
             ActiveProfile = profile.Name;
+
+            var commands = ProfileToCommandConverter.ConvertProfileToCommands(profile, OpenFFBoard);
+            await Task.Run(() =>
+            {
+                commands.ForEach(cmd =>
+                {
+                    if (!cmd())
+                        SimHub.Logging.Current.Error("Failed to execute command");
+                });
+            });
         }
 
         /// <summary>
@@ -191,12 +279,7 @@ namespace OpenFFBoardPlugin
             SimHub.Logging.Current.Info("Starting plugin");
 
             // Load settings
-            Settings = this.ReadCommonSettings<DataPluginSettings>("GeneralSettings", () => new DataPluginSettings());
-
-            Boards = global::OpenFFBoard.Serial.GetBoards();
-            ConnectToBoard(Settings.ConnectTo, Settings.BaudRate);
-
-            UpdateProfileDataIfConnected();
+            Settings = this.ReadCommonSettings<DataPluginSettings>(settingsName, () => new DataPluginSettings());
 
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)
