@@ -46,8 +46,10 @@ jobs:
         with:
           dotnet-version: '8.x'
 
-      - name: Install OpenCover
-        run: choco install opencover.portable -y
+      - name: Install OpenCover and NUnit Console Runner
+        run: |
+          nuget install OpenCover -Version 4.7.1221 -OutputDirectory packages
+          nuget install NUnit.ConsoleRunner -Version 3.18.3 -OutputDirectory packages
 
       - name: Build test project
         run: dotnet build OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj --configuration Release
@@ -55,15 +57,15 @@ jobs:
       - name: Run tests with OpenCover coverage
         shell: powershell
         run: |
-          New-Item -ItemType Directory -Force -Path test-results | Out-Null
-          $junitPath = "$env:GITHUB_WORKSPACE\test-results\junit.xml"
-          $targetArgs = "test OpenFFBoardPlugin.Tests/OpenFFBoardPlugin.Tests.csproj --configuration Release --no-build --logger `"junit;LogFilePath=$junitPath`""
-          $filter = "+[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.* -[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.Tests.*"
+          $opencover = ".\packages\OpenCover.4.7.1221\tools\OpenCover.Console.exe"
+          $nunit    = ".\packages\NUnit.ConsoleRunner.3.18.3\tools\nunit3-console.exe"
+          $testDll  = "OpenFFBoardPlugin.Tests\bin\Release\net48\OpenFFBoardPlugin.Tests.dll"
+          $filter   = "+[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.* -[OpenFFBoardPlugin.Tests]OpenFFBoardPlugin.Tests.*"
 
-          & OpenCover.Console.exe `
+          & $opencover `
             -register:user `
-            -target:"dotnet.exe" `
-            "-targetargs:$targetArgs" `
+            -target:"$nunit" `
+            "-targetargs:$testDll" `
             "-filter:$filter" `
             -output:coverage.xml `
             -returntargetcode
