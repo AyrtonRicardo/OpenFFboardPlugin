@@ -78,10 +78,10 @@ jobs:
         run: |
           if (Test-Path coverage.xml) {
             $size = (Get-Item coverage.xml).Length
-            Write-Output "coverage.xml exists — $size bytes"
+            Write-Output ('coverage.xml exists — ' + $size + ' bytes')
             Get-Content coverage.xml | Select-Object -First 30
           } else {
-            Write-Output "coverage.xml was NOT generated"
+            Write-Output 'coverage.xml was NOT generated'
           }
 
       - name: Upload coverage to Codecov
