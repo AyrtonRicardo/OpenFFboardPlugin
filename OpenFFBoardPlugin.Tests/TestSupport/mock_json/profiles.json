@@ -1,0 +1,213 @@
+{
+    "release": 2,
+    "global": {
+        "donotnotifyUpdates": false,
+        "language": "en_US",
+        "donotnotify_updates": false
+    },
+    "profiles": [
+        {
+            "name": "None",
+            "data": []
+        },
+        {
+            "name": "Flash profile",
+            "data": [
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "filterCfFreq",
+                    "value": 500
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "filterCfQ",
+                    "value": 50
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "spring",
+                    "value": 0
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "friction",
+                    "value": 0
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "damper",
+                    "value": 0
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "inertia",
+                    "value": 0
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "power",
+                    "value": 32767
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "degrees",
+                    "value": 1080
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "fxratio",
+                    "value": 165
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "esgain",
+                    "value": 100
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "idlespring",
+                    "value": 127
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "axisdamper",
+                    "value": 40
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "axisfriction",
+                    "value": 6
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "axisinertia",
+                    "value": 22
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "maxspeed",
+                    "value": 0
+                }
+            ]
+        },
+        {
+            "name": "Default",
+            "data": [
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "filterCfFreq",
+                    "value": 500
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "filterCfQ",
+                    "value": 50
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "spring",
+                    "value": 31
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "friction",
+                    "value": 255
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "damper",
+                    "value": 24
+                },
+                {
+                    "fullname": "Effects",
+                    "cls": "fx",
+                    "instance": 0,
+                    "cmd": "inertia",
+                    "value": 145
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "power",
+                    "value": 32767
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "degrees",
+                    "value": 1080
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "fxratio",
+                    "value": 165
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "esgain",
+                    "value": 100
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "idlespring",
+                    "value": 127
+                },
+                {
+                    "fullname": "Axis",
+                    "cls": "axis",
+                    "instance": 0,
+                    "cmd": "axisdamper",
+                    "value": 40
+                }
+            ]
+        }
+    ]
+}
