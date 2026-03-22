@@ -1,7 +1,7 @@
 # OpenFFBoard Plugin for SimHub
 
-[![Build](https://github.com/AyrtonRicardo/openffboard-pluginsdk/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/AyrtonRicardo/openffboard-pluginsdk/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/AyrtonRicardo/openffboard-pluginsdk/branch/main/graph/badge.svg)](https://codecov.io/gh/AyrtonRicardo/openffboard-pluginsdk)
+[![Build](https://github.com/AyrtonRicardo/OpenFFboardPlugin/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/AyrtonRicardo/OpenFFboardPlugin/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/AyrtonRicardo/OpenFFboardPlugin/graph/badge.svg?token=2PET07U88V)](https://codecov.io/gh/AyrtonRicardo/OpenFFboardPlugin)
 
 A SimHub plugin that connects [OpenFFBoard](https://github.com/Ultrawipf/OpenFFBoard) force-feedback hardware to SimHub, enabling per-game FFB profiles that are automatically applied when you launch a game.
 
