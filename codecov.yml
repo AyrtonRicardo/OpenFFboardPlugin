@@ -1,0 +1,23 @@
+coverage:
+  status:
+    project:
+      default:
+        target: auto
+        threshold: 2%
+    patch:
+      default:
+        target: auto
+        threshold: 5%
+
+ignore:
+  - "OpenFFBoardPlugin.Tests/**"
+  - "**/*.Designer.cs"
+  - "Properties/**"
+  - "DemoDialogWindow.xaml.cs"
+  - "DemoWindow.xaml.cs"
+  - "CustomDialog.xaml.cs"
+
+comment:
+  layout: "reach,diff,flags,files"
+  behavior: default
+  require_changes: true
