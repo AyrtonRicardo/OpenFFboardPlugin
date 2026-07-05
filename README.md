@@ -28,10 +28,10 @@ A SimHub plugin that connects [OpenFFBoard](https://github.com/Ultrawipf/OpenFFB
 | `axis` | `esgain`       | Endstop gain                 |
 | `axis` | `idlespring`   | Idle spring strength         |
 | `axis` | `axisdamper`   | Axis damper                  |
-| `axis` | `axisfriction` | Axis friction |
-| `axis` | `axisinertia`  | Axis inertia ⚠️ currently not supported, fix already in progress  |
+| `axis` | `axisfriction` | Axis friction                |
+| `axis` | `axisinertia`  | Axis inertia                 |
 
-> **Note:** `axisfriction` and `axisinertia` are currently not applied to the board. These commands are present in the profile format but are disabled pending investigation into why the underlying API calls do not take effect.
+> **Note:** `axisinertia` requires OpenFFBSharp with the corrected command descriptor (0x17, [MorGuux/OpenFFBSharp#8](https://github.com/MorGuux/OpenFFBSharp/pull/8)) — included in the bundled `lib/OpenFFBSharp.dll`. Older builds silently sent the wrong command ID.
 
 ## Installation
 

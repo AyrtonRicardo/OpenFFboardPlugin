@@ -29,6 +29,61 @@ namespace OpenFFBoardPlugin
         private string _lastAutoAppliedGame = null;
         private bool _isApplyingProfile = false;
 
+        // ── Corner minimum speed tracking ──────────────────────────────────────
+        // Phase machine: 0 = accelerating/steady (tracking peak), 1 = decelerating (tracking min).
+        // Published as InputDisplay.CornerMinSpeedKmh: falls live with speed while decelerating
+        // through a corner, freezes at the corner minimum once the car accelerates away.
+        private const double CornerEnterDropKmh = 5.0;   // drop below peak that starts "decelerating" phase
+        private const double CornerExitRiseKmh = 5.0;    // rise above min that ends the corner
+        private const double CornerMinValidDropKmh = 10.0; // total drop required for a real corner (filters small lifts)
+
+        private int _cornerPhase = 0;
+        private double _cornerPeakSpeed = 0;
+        private double _cornerCurrentMin = 0;
+        private double _lastCornerMinSpeed = -1;
+        private double _cornerDisplayMin = -1;
+
+        internal void UpdateCornerMinSpeed(double speedKmh, bool gameRunning)
+        {
+            if (!gameRunning)
+            {
+                _cornerPhase = 0;
+                _cornerPeakSpeed = 0;
+                return;
+            }
+
+            if (_cornerPhase == 0)
+            {
+                if (speedKmh > _cornerPeakSpeed)
+                    _cornerPeakSpeed = speedKmh;
+
+                if (_cornerPeakSpeed - speedKmh >= CornerEnterDropKmh)
+                {
+                    _cornerPhase = 1;
+                    _cornerCurrentMin = speedKmh;
+                }
+            }
+            else
+            {
+                if (speedKmh < _cornerCurrentMin)
+                    _cornerCurrentMin = speedKmh;
+
+                // live value only once the drop is big enough to be a corner (avoids flicker on small lifts)
+                if (_cornerPeakSpeed - _cornerCurrentMin >= CornerMinValidDropKmh)
+                    _cornerDisplayMin = _cornerCurrentMin;
+
+                if (speedKmh - _cornerCurrentMin >= CornerExitRiseKmh)
+                {
+                    if (_cornerPeakSpeed - _cornerCurrentMin >= CornerMinValidDropKmh)
+                        _lastCornerMinSpeed = _cornerCurrentMin;
+
+                    _cornerDisplayMin = _lastCornerMinSpeed; // freeze (or revert if the lift was too small)
+                    _cornerPhase = 0;
+                    _cornerPeakSpeed = speedKmh;
+                }
+            }
+        }
+
         /// <summary>
         /// Instance of the current plugin manager
         /// </summary>
@@ -55,6 +110,9 @@ namespace OpenFFBoardPlugin
         /// <param name="data">Current game data, including current and previous data frame.</param>
         public void DataUpdate(PluginManager pluginManager, ref GameData data)
         {
+            if (data?.NewData != null)
+                UpdateCornerMinSpeed(data.NewData.SpeedKmh, data.GameRunning);
+
             if (!Settings.AutoApplyProfileOnGameChange || !IsConnected() || _isApplyingProfile)
                 return;
 
@@ -297,6 +355,8 @@ namespace OpenFFBoardPlugin
             this.AttachDelegate(name: "InputDisplay.ShowGearAndSpeed", valueProvider: () => Settings.ShowGearAndSpeed);
             this.AttachDelegate(name: "InputDisplay.ShowExtras", valueProvider: () => Settings.ShowExtras);
             this.AttachDelegate(name: "InputDisplay.ShowSteering", valueProvider: () => Settings.ShowSteering);
+            this.AttachDelegate(name: "InputDisplay.CornerMinSpeedKmh", valueProvider: () => _cornerDisplayMin);
+            this.AttachDelegate(name: "InputDisplay.LastCornerMinSpeedKmh", valueProvider: () => _lastCornerMinSpeed);
 
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)

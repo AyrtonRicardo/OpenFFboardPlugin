@@ -93,7 +93,7 @@
                   "BackgroundColor": "#00FFFFFF",
                   "Height": 2.0,
                   "Left": 12.0,
-                  "Top": 36.0,
+                  "Top": 87.6,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 496.0,
@@ -111,7 +111,7 @@
                   "BackgroundColor": "#00FFFFFF",
                   "Height": 2.0,
                   "Left": 12.0,
-                  "Top": 63.0,
+                  "Top": 61.4,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 496.0,
@@ -129,7 +129,7 @@
                   "BackgroundColor": "#00FFFFFF",
                   "Height": 2.0,
                   "Left": 12.0,
-                  "Top": 92.0,
+                  "Top": 35.2,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 496.0,
@@ -157,7 +157,7 @@
                   "ChartSuspended": false,
                   "ChartEnabled": true,
                   "CurrentValue": 0.0,
-                  "Minimum": -1.0,
+                  "Minimum": -6.0,
                   "UseMinimum": true,
                   "UseMaximum": true,
                   "LineColor": "#66FFFFFF",
@@ -190,7 +190,7 @@
                   "ChartSuspended": false,
                   "ChartEnabled": true,
                   "CurrentValue": 0.0,
-                  "Minimum": -1.0,
+                  "Minimum": -6.0,
                   "UseMinimum": true,
                   "UseMaximum": true,
                   "LineColor": "#FF4FC3F7",
@@ -215,13 +215,46 @@
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 500.0,
+                  "Name": "Throttle TC Trace",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "ChartSuspended": false,
+                  "ChartEnabled": true,
+                  "CurrentValue": 0.0,
+                  "Minimum": -6.0,
+                  "UseMinimum": true,
+                  "UseMaximum": true,
+                  "LineColor": "#FFE040FB",
+                  "LineTickness": 3,
+                  "Maximum": 101.0,
+                  "PointsCount": 400.0,
+                  "Bindings": {
+                    "CurrentValue": {
+                      "Formula": {
+                        "JSExt": 1,
+                        "Interpreter": 1,
+                        "Expression": "var t = $prop('Throttle');\nvar tcs = $prop('TCActive');\nvar hold = tcs;\ntry {\n  var now = new Date().getTime();\n  if (tcs) root['tcHold'] = now;\n  hold = (now - (root['tcHold'] || 0)) < 250;\n} catch(e) { hold = tcs; }\nreturn hold ? t - 3.4 : t;"
+                      },
+                      "Mode": 2
+                    }
+                  }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.ChartItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 112.0,
+                  "Left": 10.0,
+                  "Top": 8.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 500.0,
                   "Name": "Throttle Trace",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "ChartSuspended": false,
                   "ChartEnabled": true,
                   "CurrentValue": 0.0,
-                  "Minimum": -1.0,
+                  "Minimum": -6.0,
                   "UseMinimum": true,
                   "UseMaximum": true,
                   "LineColor": "#FF52E052",
@@ -246,13 +279,46 @@
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 500.0,
+                  "Name": "Brake ABS Trace",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "ChartSuspended": false,
+                  "ChartEnabled": true,
+                  "CurrentValue": 0.0,
+                  "Minimum": -6.0,
+                  "UseMinimum": true,
+                  "UseMaximum": true,
+                  "LineColor": "#FFFFD600",
+                  "LineTickness": 3,
+                  "Maximum": 101.0,
+                  "PointsCount": 400.0,
+                  "Bindings": {
+                    "CurrentValue": {
+                      "Formula": {
+                        "JSExt": 1,
+                        "Interpreter": 1,
+                        "Expression": "var b = $prop('Brake');\nvar abs = $prop('ABSActive');\nvar hold = abs;\ntry {\n  var now = new Date().getTime();\n  if (abs) root['absHold'] = now;\n  hold = (now - (root['absHold'] || 0)) < 250;\n} catch(e) { hold = abs; }\nreturn hold ? b - 3.4 : b;"
+                      },
+                      "Mode": 2
+                    }
+                  }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.ChartItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 112.0,
+                  "Left": 10.0,
+                  "Top": 8.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 500.0,
                   "Name": "Brake Trace",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "ChartSuspended": false,
                   "ChartEnabled": true,
                   "CurrentValue": 0.0,
-                  "Minimum": -1.0,
+                  "Minimum": -6.0,
                   "UseMinimum": true,
                   "UseMaximum": true,
                   "LineColor": "#FFFF4545",
@@ -702,7 +768,7 @@
                   "Top": 18.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 78.0,
+                  "Width": 34.0,
                   "Name": "Gear",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
@@ -729,19 +795,19 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
                   "BackgroundColor": "#00FFFFFF",
-                  "Height": 20.0,
-                  "Left": 0.0,
-                  "Top": 76.0,
+                  "Height": 26.0,
+                  "Left": 34.0,
+                  "Top": 22.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 78.0,
+                  "Width": 44.0,
                   "Name": "Speed",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "IsTextItem": true,
                   "Font": "Roboto",
                   "FontWeight": "SemiBold",
-                  "FontSize": 18.0,
+                  "FontSize": 24.0,
                   "Text": "0",
                   "TextColor": "#FFFFFFFF",
                   "HorizontalAlignment": 1,
@@ -754,6 +820,72 @@
                       "FormatString": "0",
                       "Formula": {
                         "Expression": "[SpeedLocal]"
+                      },
+                      "Mode": 2
+                    }
+                  }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 9.0,
+                  "Left": 34.0,
+                  "Top": 50.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 44.0,
+                  "Name": "Min Label",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "IsTextItem": true,
+                  "Font": "Roboto",
+                  "FontWeight": "SemiBold",
+                  "FontSize": 7.0,
+                  "Text": "MIN",
+                  "TextColor": "#FF8A8A98",
+                  "HorizontalAlignment": 1,
+                  "VerticalAlignment": 1,
+                  "CharWidth": 9.0,
+                  "SpecialCharsWidth": 3.0,
+                  "SpecialChars": ".,:; "
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 17.0,
+                  "Left": 34.0,
+                  "Top": 59.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 44.0,
+                  "Name": "Min Speed",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "IsTextItem": true,
+                  "Font": "Roboto",
+                  "FontWeight": "SemiBold",
+                  "FontSize": 15.0,
+                  "Text": "--",
+                  "TextColor": "#FFFFD600",
+                  "HorizontalAlignment": 1,
+                  "VerticalAlignment": 1,
+                  "CharWidth": 9.0,
+                  "SpecialCharsWidth": 3.0,
+                  "SpecialChars": ".,:; ",
+                  "Bindings": {
+                    "Text": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var m = $prop('OpenFFBoardPlugin.InputDisplay.CornerMinSpeedKmh');\nif (m == null || m < 0) return '--';\nconst unit = $prop('SpeedLocalUnit');\nreturn '' + Math.round((unit == 'KMH') ? m : m * 0.621371);"
+                      },
+                      "Mode": 2
+                    },
+                    "TextColor": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var m = $prop('OpenFFBoardPlugin.InputDisplay.CornerMinSpeedKmh');\nif (m == null || m < 0) return '#FF8A8A98';\nreturn (Math.abs($prop('SpeedKmh') - m) < 3) ? '#FFFFD600' : '#FFFFFFFF';"
                       },
                       "Mode": 2
                     }
@@ -787,7 +919,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "const unit = $prop('SpeedLocalUnit');\nif (unit == \"KMH\") return \"km/h\";\nreturn \"mph\";"
+                        "Expression": "const unit = $prop('SpeedLocalUnit');\nif (unit == 'KMH') return 'km/h';\nreturn 'mph';"
                       },
                       "Mode": 2
                     }
@@ -860,12 +992,12 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.RectangleItem, SimHub.Plugins",
                   "BackgroundColor": "#FF23232E",
-                  "Height": 30.0,
-                  "Left": 0.0,
-                  "Top": 10.0,
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 22.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 62.0,
+                  "Width": 48.0,
                   "Name": "ABS Box",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
@@ -882,7 +1014,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "return $prop('ABSActive') ? '#FFD32F2F' : '#FF23232E';"
+                        "Expression": "if (!$prop('ABSActive')) return '#FF23232E';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFD32F2F' : '#FF5A1414';"
                       },
                       "Mode": 2
                     }
@@ -891,19 +1023,19 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
                   "BackgroundColor": "#00FFFFFF",
-                  "Height": 30.0,
-                  "Left": 0.0,
-                  "Top": 10.0,
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 22.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 62.0,
+                  "Width": 48.0,
                   "Name": "ABS",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "IsTextItem": true,
                   "Font": "Roboto",
                   "FontWeight": "Bold",
-                  "FontSize": 13.0,
+                  "FontSize": 10.0,
                   "Text": "ABS",
                   "TextColor": "#FF8A8A98",
                   "HorizontalAlignment": 1,
@@ -916,7 +1048,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "return $prop('ABSActive') ? '#FFFFFFFF' : '#FF8A8A98';"
+                        "Expression": "if (!$prop('ABSActive')) return '#FF8A8A98';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFFFFFF' : '#FFE0B0B0';"
                       },
                       "Mode": 2
                     }
@@ -925,12 +1057,12 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.RectangleItem, SimHub.Plugins",
                   "BackgroundColor": "#FF23232E",
-                  "Height": 30.0,
-                  "Left": 0.0,
-                  "Top": 49.0,
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 53.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 62.0,
+                  "Width": 48.0,
                   "Name": "TC Box",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
@@ -947,7 +1079,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "return $prop('TCActive') ? '#FFFF9800' : '#FF23232E';"
+                        "Expression": "if (!$prop('TCActive')) return '#FF23232E';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFE040FB' : '#FF6A1B7A';"
                       },
                       "Mode": 2
                     }
@@ -956,19 +1088,19 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
                   "BackgroundColor": "#00FFFFFF",
-                  "Height": 30.0,
-                  "Left": 0.0,
-                  "Top": 49.0,
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 53.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 62.0,
+                  "Width": 48.0,
                   "Name": "TC",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "IsTextItem": true,
                   "Font": "Roboto",
                   "FontWeight": "Bold",
-                  "FontSize": 13.0,
+                  "FontSize": 10.0,
                   "Text": "TC",
                   "TextColor": "#FF8A8A98",
                   "HorizontalAlignment": 1,
@@ -981,7 +1113,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "return $prop('TCActive') ? '#FFFFFFFF' : '#FF8A8A98';"
+                        "Expression": "if (!$prop('TCActive')) return '#FF8A8A98';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFFFFFF' : '#FFEFC3F7';"
                       },
                       "Mode": 2
                     }
@@ -990,12 +1122,12 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.RectangleItem, SimHub.Plugins",
                   "BackgroundColor": "#FF23232E",
-                  "Height": 30.0,
-                  "Left": 0.0,
-                  "Top": 88.0,
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 84.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 62.0,
+                  "Width": 48.0,
                   "Name": "BB Box",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
@@ -1011,19 +1143,19 @@
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
                   "BackgroundColor": "#00FFFFFF",
-                  "Height": 30.0,
-                  "Left": 0.0,
-                  "Top": 88.0,
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 84.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
-                  "Width": 62.0,
+                  "Width": 48.0,
                   "Name": "BB",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "IsTextItem": true,
                   "Font": "Roboto",
                   "FontWeight": "Bold",
-                  "FontSize": 11.0,
+                  "FontSize": 9.0,
                   "Text": "BB --",
                   "TextColor": "#FFFFFFFF",
                   "HorizontalAlignment": 1,

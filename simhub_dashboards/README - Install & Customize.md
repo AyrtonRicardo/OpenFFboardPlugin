@@ -8,7 +8,7 @@ Works with iRacing, ACC, AC, and any other SimHub-supported game (uses generic t
 - **Input trace graph** — scrolling history of throttle (green), brake (red), clutch (blue), and a faint white steering trace, with 25/50/75% guide lines
 - **Pedal bars** — live Clutch / Brake / Throttle bars with % values
 - **Gear, speed, RPM** — big gear digit, speed in your local unit (km/h or mph), rpm, plus a 6-LED shift light strip
-- **ABS / TC / BB** — ABS lights red and TC lights orange when active; BB shows brake bias (games that report it)
+- **ABS / TC / BB** — ABS blinks red when active and a yellow stripe appears under the brake trace exactly where ABS triggered; TC blinks magenta with a magenta stripe under the throttle trace where it intervened; BB shows brake bias (games that report it)
 - **Steering wheel** — rotating wheel indicator
 
 ## Install
@@ -33,6 +33,7 @@ With the OpenFFBoard companion plugin installed, open **OpenFFBoard companion �
 | Background opacity (%) | `InputDisplay.BackgroundOpacity` | 70 |
 | Shift light threshold (% of max RPM) | `InputDisplay.ShiftLightThresholdPercent` | 85 |
 | Show/hide Traces, Pedals, Gear & Speed, ABS/TC/BB, Steering | `InputDisplay.Show*` | all on |
+| Corner minimum speed (read-only, computed by the plugin) | `InputDisplay.CornerMinSpeedKmh`, `InputDisplay.LastCornerMinSpeedKmh` | — |
 
 If the plugin isn't installed, the dashboard falls back to the defaults above — it still works standalone.
 
