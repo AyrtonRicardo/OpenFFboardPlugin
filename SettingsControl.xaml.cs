@@ -35,10 +35,61 @@ namespace OpenFFBoardPlugin
             var profilePath = Plugin.Settings.ProfileJsonPath;
             ViewProfileJsonPath.Text = !string.IsNullOrEmpty(profilePath) ? profilePath + "\\profiles.json" : "Not configured";
 
+            // Dashboard extras
+            ViewSteeringRotation.Value = Plugin.Settings.SteeringRotationDegrees;
+            ViewBackgroundOpacity.Value = Plugin.Settings.BackgroundOpacity;
+            ViewShiftLightThreshold.Value = Plugin.Settings.ShiftLightThresholdPercent;
+            ViewShowTraces.IsChecked = Plugin.Settings.ShowTraces;
+            ViewShowPedals.IsChecked = Plugin.Settings.ShowPedals;
+            ViewShowGearAndSpeed.IsChecked = Plugin.Settings.ShowGearAndSpeed;
+            ViewShowExtras.IsChecked = Plugin.Settings.ShowExtras;
+            ViewShowSteering.IsChecked = Plugin.Settings.ShowSteering;
+            RefreshExtrasValueLabels();
+
             RefreshProfileCount();
             RefreshCurrentGame();
             RefreshActiveProfile();
             RefreshConnectionStatus(null);
+        }
+
+        // ── Dashboard extras ───────────────────────────────────────────────────
+
+        private void RefreshExtrasValueLabels()
+        {
+            ViewSteeringRotationValue.Text = $"{(int)ViewSteeringRotation.Value}°";
+            ViewBackgroundOpacityValue.Text = $"{(int)ViewBackgroundOpacity.Value}%";
+            ViewShiftLightThresholdValue.Text = $"{(int)ViewShiftLightThreshold.Value}%";
+        }
+
+        private void ViewSteeringRotation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (Plugin == null) return;
+            Plugin.Settings.SteeringRotationDegrees = (int)e.NewValue;
+            RefreshExtrasValueLabels();
+        }
+
+        private void ViewBackgroundOpacity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (Plugin == null) return;
+            Plugin.Settings.BackgroundOpacity = (int)e.NewValue;
+            RefreshExtrasValueLabels();
+        }
+
+        private void ViewShiftLightThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (Plugin == null) return;
+            Plugin.Settings.ShiftLightThresholdPercent = (int)e.NewValue;
+            RefreshExtrasValueLabels();
+        }
+
+        private void ModuleToggle_Changed(object sender, RoutedEventArgs e)
+        {
+            if (Plugin == null) return;
+            Plugin.Settings.ShowTraces = ViewShowTraces.IsChecked == true;
+            Plugin.Settings.ShowPedals = ViewShowPedals.IsChecked == true;
+            Plugin.Settings.ShowGearAndSpeed = ViewShowGearAndSpeed.IsChecked == true;
+            Plugin.Settings.ShowExtras = ViewShowExtras.IsChecked == true;
+            Plugin.Settings.ShowSteering = ViewShowSteering.IsChecked == true;
         }
 
         // ── Connection state ───────────────────────────────────────────────────

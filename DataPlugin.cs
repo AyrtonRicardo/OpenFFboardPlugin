@@ -286,6 +286,18 @@ namespace OpenFFBoardPlugin
             // Load settings
             Settings = this.ReadCommonSettings<DataPluginSettings>(settingsName, () => new DataPluginSettings());
 
+            // Dashboard extras: published as properties so the
+            // "OpenFFBoard Companion - Input Display" dashboard (and any other dash)
+            // can bind to them instead of relying on manually edited dashboard variables.
+            this.AttachDelegate(name: "InputDisplay.SteeringRotationDegrees", valueProvider: () => Settings.SteeringRotationDegrees);
+            this.AttachDelegate(name: "InputDisplay.BackgroundOpacity", valueProvider: () => Settings.BackgroundOpacity);
+            this.AttachDelegate(name: "InputDisplay.ShiftLightThresholdPercent", valueProvider: () => Settings.ShiftLightThresholdPercent);
+            this.AttachDelegate(name: "InputDisplay.ShowTraces", valueProvider: () => Settings.ShowTraces);
+            this.AttachDelegate(name: "InputDisplay.ShowPedals", valueProvider: () => Settings.ShowPedals);
+            this.AttachDelegate(name: "InputDisplay.ShowGearAndSpeed", valueProvider: () => Settings.ShowGearAndSpeed);
+            this.AttachDelegate(name: "InputDisplay.ShowExtras", valueProvider: () => Settings.ShowExtras);
+            this.AttachDelegate(name: "InputDisplay.ShowSteering", valueProvider: () => Settings.ShowSteering);
+
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)
             //this.AttachDelegate(name: "CurrentDateTime", valueProvider: () => DateTime.Now);

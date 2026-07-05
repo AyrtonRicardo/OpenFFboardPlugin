@@ -223,6 +223,101 @@
 
                     <styles:SHSectionSeparator />
 
+                    <!-- ═══ DASHBOARD EXTRAS ═════════════════════════════════════════ -->
+                    <styles:SHSubSection Title="Dashboard Extras">
+                        <StackPanel>
+
+                            <TextBlock Text="Used by the 'OpenFFBoard Companion - Input Display' dashboard. Published as SimHub properties (OpenFFBoardPlugin.InputDisplay.*)."
+                                       TextWrapping="Wrap"
+                                       Opacity="0.55"
+                                       FontSize="11"
+                                       Margin="0,4,0,8" />
+
+                            <!-- Steering rotation -->
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="50" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Steering rotation (°):" Opacity="0.55" VerticalAlignment="Center" />
+                                <Slider Grid.Column="1" x:Name="ViewSteeringRotation"
+                                        Minimum="180" Maximum="1440"
+                                        TickFrequency="10" IsSnapToTickEnabled="True"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="ViewSteeringRotation_ValueChanged" />
+                                <TextBlock Grid.Column="2" x:Name="ViewSteeringRotationValue"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <!-- Background opacity -->
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="50" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Background opacity (%):" Opacity="0.55" VerticalAlignment="Center" />
+                                <Slider Grid.Column="1" x:Name="ViewBackgroundOpacity"
+                                        Minimum="0" Maximum="100"
+                                        TickFrequency="5" IsSnapToTickEnabled="True"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="ViewBackgroundOpacity_ValueChanged" />
+                                <TextBlock Grid.Column="2" x:Name="ViewBackgroundOpacityValue"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <!-- Shift light threshold -->
+                            <Grid Margin="0,8,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="50" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Shift light at (% max RPM):" Opacity="0.55" VerticalAlignment="Center" />
+                                <Slider Grid.Column="1" x:Name="ViewShiftLightThreshold"
+                                        Minimum="50" Maximum="100"
+                                        TickFrequency="1" IsSnapToTickEnabled="True"
+                                        VerticalAlignment="Center"
+                                        ValueChanged="ViewShiftLightThreshold_ValueChanged" />
+                                <TextBlock Grid.Column="2" x:Name="ViewShiftLightThresholdValue"
+                                           VerticalAlignment="Center" HorizontalAlignment="Right" />
+                            </Grid>
+
+                            <!-- Module toggles -->
+                            <TextBlock Text="Visible modules"
+                                       Margin="0,12,0,4"
+                                       Opacity="0.55"
+                                       FontSize="11" />
+
+                            <WrapPanel>
+                                <styles:SHToggleCheckbox x:Name="ViewShowTraces" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    Traces
+                                </styles:SHToggleCheckbox>
+                                <styles:SHToggleCheckbox x:Name="ViewShowPedals" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    Pedals
+                                </styles:SHToggleCheckbox>
+                                <styles:SHToggleCheckbox x:Name="ViewShowGearAndSpeed" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    Gear &amp; Speed
+                                </styles:SHToggleCheckbox>
+                                <styles:SHToggleCheckbox x:Name="ViewShowExtras" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    ABS / TC / BB
+                                </styles:SHToggleCheckbox>
+                                <styles:SHToggleCheckbox x:Name="ViewShowSteering" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    Steering
+                                </styles:SHToggleCheckbox>
+                            </WrapPanel>
+
+                        </StackPanel>
+                    </styles:SHSubSection>
+
+                    <styles:SHSectionSeparator />
+
                     <!-- ═══ PLUGIN SETTINGS ══════════════════════════════════════════ -->
                     <styles:SHSubSection Title="Plugin Settings">
                         <StackPanel>
