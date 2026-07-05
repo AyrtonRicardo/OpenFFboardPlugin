@@ -339,6 +339,13 @@
                                            ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
                             </Grid>
 
+                            <styles:SHToggleCheckbox x:Name="ViewAutoUpdateDashboards"
+                                                     Margin="0,10,0,0"
+                                                     Checked="ViewAutoUpdateDashboards_Changed"
+                                                     Unchecked="ViewAutoUpdateDashboards_Changed">
+                                Auto-update bundled dashboards on startup
+                            </styles:SHToggleCheckbox>
+
                             <styles:SHButtonPrimary HorizontalAlignment="Left"
                                                     Margin="0,10,0,0"
                                                     Click="SaveConfiguration_Click">
