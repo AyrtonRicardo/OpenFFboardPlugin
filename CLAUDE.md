@@ -47,3 +47,5 @@ SimHub game change / manual trigger
 - Supported `axis` commands: `power`, `degrees`, `fxratio`, `esgain`, `idlespring`, `axisdamper`, `axisfriction`, `axisinertia`.
 
 **Settings** (`DataPluginSettings.cs`) are serialized to JSON via SimHub's `SaveCommonSettings` / `ReadCommonSettings`. The storage path is `{SimHub common storage}/{PluginName}.OpenFFBoardPluginSettings.json`.
+
+**Dashboard extras** (`simhub_dashboards/`): the "OpenFFBoard Companion - Input Display" dashboard binds to plugin properties published via `AttachDelegate` in `DataPlugin.Init()` under the `InputDisplay.*` prefix (steering rotation, background opacity, shift light threshold, module show/hide toggles, corner min speed — computed per-frame in `DataPlugin.UpdateCornerMinSpeed`). Values are configured in the "Dashboard Extras" section of `SettingsControl` and persisted in `DataPluginSettings`. Dashboard expressions fall back to defaults when plugin properties are null, so the dash also works standalone. When editing the `.djson`, re-zip the folder contents into the `.simhubdash` file.
