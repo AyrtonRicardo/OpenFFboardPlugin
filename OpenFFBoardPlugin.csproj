@@ -104,6 +104,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Pipelines, Version=9.0.0.9, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>packages\System.IO.Pipelines.9.0.9\lib\net462\System.IO.Pipelines.dll</HintPath>
     </Reference>
@@ -192,6 +193,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="simhub_dashboards\OpenFFBoard Companion - Input Display.simhubdash" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -199,7 +201,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY /Y /R "$(TargetDir)OpenFFB*" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Hid.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Device.Net.dll" "$(SIMHUB_INSTALL_PATH)"</PostBuildEvent>
+    <PostBuildEvent>XCOPY /Y /R "$(TargetDir)OpenFFB*" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Hid.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Device.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R /I /E "$(ProjectDir)simhub_dashboards\OpenFFBoard Companion - Input Display\*" "$(SIMHUB_INSTALL_PATH)DashTemplates\OpenFFBoard Companion - Input Display\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

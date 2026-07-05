@@ -11,6 +11,8 @@ A SimHub plugin that connects [OpenFFBoard](https://github.com/Ultrawipf/OpenFFB
 - **Per-game profiles** — stores FFB settings in a `profiles.json` file; the correct profile is automatically applied when SimHub detects a game change
 - **Profile management** — create a new profile for the current game (cloned from the Default profile) or apply an existing one to the board with dedicated buttons
 - **Graceful fallback** — if no profile exists for the current game, no changes are sent to the board
+- **Bundled dashboard** — ships with the "OpenFFBoard Companion - Input Display" overlay (input traces with ABS/TC highlighting, corner minimum speed, configurable extras via the plugin settings page; see `simhub_dashboards/`)
+- **Dashboard auto-update** — when *Auto-update bundled dashboards on startup* is enabled in the plugin settings (default: on), the dashboard embedded in the plugin DLL is extracted into SimHub's `DashTemplates` folder whenever its version is newer than the installed one, so the overlay always matches the plugin. Disable the toggle if you've customized the dashboard locally and don't want it overwritten.
 
 ## Supported FFB commands
 
@@ -89,7 +91,9 @@ The plugin reads a `profiles.json` file whose path you configure in the plugin s
 "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe" OpenFFBoardPlugin.sln /p:Configuration=Debug
 ```
 
-The post-build event copies output DLLs to `%SIMHUB_INSTALL_PATH%` automatically. If the env var is not set the build still succeeds and only the XCOPY step is skipped.
+The post-build event copies output DLLs to `%SIMHUB_INSTALL_PATH%` and the dashboard files from `simhub_dashboards/` to `%SIMHUB_INSTALL_PATH%DashTemplates\` automatically. If the env var is not set the build still succeeds and only the XCOPY steps are skipped.
+
+The dashboard's `.simhubdash` file is also embedded into the plugin DLL as a resource — this is what powers the runtime dashboard auto-update. When you edit the dashboard, re-zip the folder contents into the `.simhubdash`, bump `DashboardVersion` in the `.djson.metadata`, and rebuild.
 
 ### Debug
 

@@ -30,6 +30,7 @@ namespace OpenFFBoardPlugin
 
             ViewAutoConnectOnStartup.IsChecked = Plugin.Settings.AutoConnectOnStartup;
             ViewAutoApplyOnGameChange.IsChecked = Plugin.Settings.AutoApplyProfileOnGameChange;
+            ViewAutoUpdateDashboards.IsChecked = Plugin.Settings.AutoUpdateDashboards;
             ViewPluginConfigJsonPath.Text = Plugin.GetCommonStoragePath();
 
             var profilePath = Plugin.Settings.ProfileJsonPath;
@@ -391,6 +392,19 @@ namespace OpenFFBoardPlugin
         {
             if (Plugin != null)
                 Plugin.Settings.AutoApplyProfileOnGameChange = false;
+        }
+
+        private void ViewAutoUpdateDashboards_Changed(object sender, RoutedEventArgs e)
+        {
+            if (Plugin == null) return;
+
+            bool enabled = ViewAutoUpdateDashboards.IsChecked == true;
+            bool wasEnabled = Plugin.Settings.AutoUpdateDashboards;
+            Plugin.Settings.AutoUpdateDashboards = enabled;
+
+            // run an update immediately when the user turns it on
+            if (enabled && !wasEnabled)
+                Plugin.UpdateBundledDashboards();
         }
     }
 

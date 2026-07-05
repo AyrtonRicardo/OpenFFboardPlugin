@@ -4,6 +4,11 @@ using OpenFFBoardPlugin.DTO;
 using OpenFFBoardPlugin.Utils;
 using SimHub.Plugins;
 using System;
+using System.IO;
+using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using WoteverCommon.Extensions;
@@ -332,6 +337,73 @@ namespace OpenFFBoardPlugin
             });
         }
 
+        // ── Bundled dashboard auto-update ──────────────────────────────────────
+
+        private const string BundledDashboardName = "OpenFFBoard Companion - Input Display";
+
+        private static string ExtractDashboardVersion(string metadataJson)
+        {
+            var match = Regex.Match(metadataJson ?? "", "\"DashboardVersion\"\\s*:\\s*\"([^\"]+)\"");
+            return match.Success ? match.Groups[1].Value : null;
+        }
+
+        /// <summary>
+        /// Extracts the dashboard bundled as an embedded resource (.simhubdash zip) into
+        /// SimHub's DashTemplates folder. Skipped when the installed DashboardVersion matches.
+        /// </summary>
+        internal void UpdateBundledDashboards(bool force = false)
+        {
+            try
+            {
+                string simhubDir = AppDomain.CurrentDomain.BaseDirectory;
+                string targetDir = Path.Combine(simhubDir, "DashTemplates", BundledDashboardName);
+                string metaFileName = BundledDashboardName + ".djson.metadata";
+
+                var assembly = Assembly.GetExecutingAssembly();
+                string resourceName = assembly.GetManifestResourceNames()
+                    .FirstOrDefault(n => n.EndsWith(".simhubdash", StringComparison.OrdinalIgnoreCase));
+                if (resourceName == null)
+                {
+                    SimHub.Logging.Current.Warn("Bundled dashboard resource not found, skipping dashboard update");
+                    return;
+                }
+
+                using (var stream = assembly.GetManifestResourceStream(resourceName))
+                using (var zip = new ZipArchive(stream, ZipArchiveMode.Read))
+                {
+                    string bundledVersion = null;
+                    var metaEntry = zip.GetEntry(metaFileName);
+                    if (metaEntry != null)
+                        using (var reader = new StreamReader(metaEntry.Open()))
+                            bundledVersion = ExtractDashboardVersion(reader.ReadToEnd());
+
+                    string installedMetaPath = Path.Combine(targetDir, metaFileName);
+                    string installedVersion = File.Exists(installedMetaPath)
+                        ? ExtractDashboardVersion(File.ReadAllText(installedMetaPath))
+                        : null;
+
+                    if (!force && bundledVersion != null && bundledVersion == installedVersion)
+                        return; // already up to date
+
+                    Directory.CreateDirectory(targetDir);
+                    foreach (var entry in zip.Entries)
+                    {
+                        string destination = Path.Combine(targetDir, entry.Name);
+                        using (var source = entry.Open())
+                        using (var file = File.Create(destination))
+                            source.CopyTo(file);
+                    }
+
+                    SimHub.Logging.Current.Info(
+                        $"Updated bundled dashboard '{BundledDashboardName}' from version {installedVersion ?? "none"} to {bundledVersion ?? "unknown"}");
+                }
+            }
+            catch (Exception ex)
+            {
+                SimHub.Logging.Current.Warn($"Dashboard auto-update failed: {ex.Message}");
+            }
+        }
+
         /// <summary>
         /// Called once after plugins startup
         /// Plugins are rebuilt at game change
@@ -357,6 +429,9 @@ namespace OpenFFBoardPlugin
             this.AttachDelegate(name: "InputDisplay.ShowSteering", valueProvider: () => Settings.ShowSteering);
             this.AttachDelegate(name: "InputDisplay.CornerMinSpeedKmh", valueProvider: () => _cornerDisplayMin);
             this.AttachDelegate(name: "InputDisplay.LastCornerMinSpeedKmh", valueProvider: () => _lastCornerMinSpeed);
+
+            if (Settings.AutoUpdateDashboards)
+                UpdateBundledDashboards();
 
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)

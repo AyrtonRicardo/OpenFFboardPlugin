@@ -11,6 +11,12 @@
         public string SelectedHidDeviceId = null;
 
         /// <summary>
+        /// When true, the dashboard bundled in the plugin DLL is extracted into SimHub's
+        /// DashTemplates folder on startup whenever its version differs from the installed one.
+        /// </summary>
+        public bool AutoUpdateDashboards = true;
+
+        /// <summary>
         /// Dashboard extras: published as SimHub properties (InputDisplay.*) and consumed
         /// by the "OpenFFBoard Companion - Input Display" dashboard.
         /// </summary>
