@@ -1209,7 +1209,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "if (!$prop('OpenFFBoardDataPlugin.InputDisplay.FFBClipping')) return '#FF23232E';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFF6D00' : '#FF7A3300';"
+                        "Expression": "var ff = $prop('GameRawData.Physics.FinalFF');\nvar clipping = false;\nif (ff != null) clipping = Math.abs(ff) >= 0.98;\nelse { var pct = $prop('GameRawData.Telemetry.SteeringWheelPctTorque'); if (pct != null) clipping = Math.abs(pct) >= 0.98; }\nif (!clipping) return '#FF23232E';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFF6D00' : '#FF7A3300';"
                       },
                       "Mode": 2
                     },
@@ -1251,7 +1251,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "if (!$prop('OpenFFBoardDataPlugin.InputDisplay.FFBClipping')) return '#FF8A8A98';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFFFFFF' : '#FFFFD9B3';"
+                        "Expression": "var ff = $prop('GameRawData.Physics.FinalFF');\nvar clipping = false;\nif (ff != null) clipping = Math.abs(ff) >= 0.98;\nelse { var pct = $prop('GameRawData.Telemetry.SteeringWheelPctTorque'); if (pct != null) clipping = Math.abs(pct) >= 0.98; }\nif (!clipping) return '#FF8A8A98';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFFFFFF' : '#FFFFD9B3';"
                       },
                       "Mode": 2
                     },

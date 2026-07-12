@@ -34,10 +34,6 @@ namespace OpenFFBoardPlugin
         private string _lastAutoAppliedGame = null;
         private bool _isApplyingProfile = false;
 
-        // Serializes access to the HID connection: the FFB clip poll timer and profile
-        // application both issue synchronous HID commands and must not interleave.
-        private readonly object _hidCommandLock = new object();
-
         // ── Corner minimum speed tracking ──────────────────────────────────────
         // Phase machine: 0 = accelerating/steady (tracking peak), 1 = decelerating (tracking min).
         // Published as InputDisplay.CornerMinSpeedKmh: falls live with speed while decelerating
@@ -169,9 +165,6 @@ namespace OpenFFBoardPlugin
         public void End(PluginManager pluginManager)
         {
             this.SaveConfig();
-
-            _ffbClippingPollTimer?.Dispose();
-            _ffbClippingPollTimer = null;
 
             this.Disconnect();
         }
@@ -358,55 +351,12 @@ namespace OpenFFBoardPlugin
             var commands = ProfileToCommandConverter.ConvertProfileToCommands(profile, OpenFFBoard);
             await Task.Run(() =>
             {
-                lock (_hidCommandLock)
+                commands.ForEach(cmd =>
                 {
-                    commands.ForEach(cmd =>
-                    {
-                        if (!cmd())
-                            SimHub.Logging.Current.Error("Failed to execute command");
-                    });
-                }
+                    if (!cmd())
+                        SimHub.Logging.Current.Error("Failed to execute command");
+                });
             });
-        }
-
-        // ── FFB clipping detection ───────────────────────────────────────────────
-        // OpenFFBoard's HID API has no direct "clipping" signal, so this polls the live
-        // axis torque against the configured power cap and treats "near the cap" as clipping.
-        private const double FfbClippingThresholdRatio = 0.95;
-        private const int FfbClippingPollIntervalMs = 50;
-
-        private System.Threading.Timer _ffbClippingPollTimer;
-        private volatile bool _ffbClipping = false;
-
-        private void PollFfbClipping(object state)
-        {
-            try
-            {
-                var board = OpenFFBoard;
-                if (!Settings.ShowFFBClipping || board == null || !board.IsConnected)
-                {
-                    _ffbClipping = false;
-                    return;
-                }
-
-                long curTorque;
-                ushort power;
-                lock (_hidCommandLock)
-                {
-                    curTorque = board.Axis.GetCurtorque();
-                    power = board.Axis.GetPower();
-                }
-
-                _ffbClipping = power > 0 && Math.Abs(curTorque) >= power * FfbClippingThresholdRatio;
-            }
-            catch
-            {
-                _ffbClipping = false;
-            }
-            finally
-            {
-                _ffbClippingPollTimer?.Change(FfbClippingPollIntervalMs, System.Threading.Timeout.Infinite);
-            }
         }
 
         // ── Bundled dashboard auto-update ──────────────────────────────────────
@@ -446,9 +396,6 @@ namespace OpenFFBoardPlugin
             this.AttachDelegate(name: "InputDisplay.WheelImage", valueProvider: () => Settings.WheelImage);
             this.AttachDelegate(name: "InputDisplay.CornerMinSpeedKmh", valueProvider: () => _cornerDisplayMin);
             this.AttachDelegate(name: "InputDisplay.LastCornerMinSpeedKmh", valueProvider: () => _lastCornerMinSpeed);
-            this.AttachDelegate(name: "InputDisplay.FFBClipping", valueProvider: () => _ffbClipping);
-
-            _ffbClippingPollTimer = new System.Threading.Timer(PollFfbClipping, null, 0, System.Threading.Timeout.Infinite);
 
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)

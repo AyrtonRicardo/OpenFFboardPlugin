@@ -8,7 +8,7 @@ Works with iRacing, ACC, AC, and any other SimHub-supported game (uses generic t
 - **Input trace graph** — scrolling history of throttle (green), brake (red), clutch (blue), and a faint white steering trace, with 25/50/75% guide lines
 - **Pedal bars** — live Clutch / Brake / Throttle bars with % values
 - **Gear, speed, RPM** — big gear digit, speed in your local unit (km/h or mph), rpm, plus a 6-LED shift light strip
-- **ABS / TC / BB / CLIP** — ABS blinks red when active and a yellow stripe appears under the brake trace exactly where ABS triggered; TC blinks magenta with a magenta stripe under the throttle trace where it intervened; BB shows brake bias (games that report it); CLIP blinks orange when the board's live FFB torque is at/near its configured power cap
+- **ABS / TC / BB / CLIP** — ABS blinks red when active and a yellow stripe appears under the brake trace exactly where ABS triggered; TC blinks magenta with a magenta stripe under the throttle trace where it intervened; BB shows brake bias (games that report it); CLIP blinks orange when the game's own force-feedback signal is pegged at its max (AC/ACC/iRacing)
 - **Steering wheel** — rotating wheel indicator
 
 ## Install
@@ -25,7 +25,7 @@ Works with iRacing, ACC, AC, and any other SimHub-supported game (uses generic t
 
 ## Configure via the plugin (no dashboard editing needed)
 
-With the OpenFFBoard companion plugin installed, open **OpenFFBoard companion → Dashboard Extras** in SimHub's left menu. Everything below is published as SimHub properties (`OpenFFBoardDataPlugin.InputDisplay.*`) that the dashboard reads live:
+With the OpenFFBoard companion plugin installed, open **OpenFFBoard companion → Extra configurations → Dashboard Extras** in SimHub's left menu. Everything below is published as SimHub properties (`OpenFFBoardDataPlugin.InputDisplay.*`) that the dashboard reads live:
 
 | Setting | Property | Default |
 |---|---|---|
@@ -44,5 +44,5 @@ If the plugin isn't installed, the dashboard falls back to the defaults above �
 - The shift LED strip lights progressively from the configured threshold up to max RPM; the last LED is red.
 - Deeper edits (colors, layout, trace speed via `PointsCount`) are still done in **Dash Studio → Dashboards → Edit dashboard** — every element is grouped (Traces, Pedals, Gear and Speed, Extras, Steering).
 - On iRacing, ABS/TC boxes only light for cars that have those assists; BB shows `--` when the game doesn't report brake bias.
-- FFB clipping isn't reported by the board's firmware directly — the plugin polls live axis torque against the configured power cap (while connected) and treats being within 5% of the cap as clipping. It's an estimate, not an exact clip event.
+- FFB clipping is read straight from the game's own telemetry, not the board: `Physics.FinalFF` on AC/ACC (the actual signal sent to the wheel, clips at ±1) or `SteeringWheelPctTorque` on iRacing, both treated as clipping at ~98% of max. Games that report neither just never show CLIP.
 - The "MIN" readout shows the last corner's minimum speed for ~4 seconds after you accelerate out of it, then the label switches to "SPD" and it falls back to showing live speed until the next corner.
