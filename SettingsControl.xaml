@@ -317,6 +317,10 @@
                                                          Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
                                     Steering
                                 </styles:SHToggleCheckbox>
+                                <styles:SHToggleCheckbox x:Name="ViewShowFFBClipping" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    FFB Clipping
+                                </styles:SHToggleCheckbox>
                             </WrapPanel>
 
                         </StackPanel>

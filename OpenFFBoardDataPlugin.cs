@@ -34,19 +34,27 @@ namespace OpenFFBoardPlugin
         private string _lastAutoAppliedGame = null;
         private bool _isApplyingProfile = false;
 
+        // Serializes access to the HID connection: the FFB clip poll timer and profile
+        // application both issue synchronous HID commands and must not interleave.
+        private readonly object _hidCommandLock = new object();
+
         // ── Corner minimum speed tracking ──────────────────────────────────────
         // Phase machine: 0 = accelerating/steady (tracking peak), 1 = decelerating (tracking min).
         // Published as InputDisplay.CornerMinSpeedKmh: falls live with speed while decelerating
-        // through a corner, freezes at the corner minimum once the car accelerates away.
+        // through a corner, freezes at the corner minimum for CornerMinDisplaySeconds once the car
+        // accelerates away, then clears so the dashboard falls back to showing live speed.
+        // InputDisplay.LastCornerMinSpeedKmh keeps the permanent (non-expiring) record.
         private const double CornerEnterDropKmh = 5.0;   // drop below peak that starts "decelerating" phase
         private const double CornerExitRiseKmh = 5.0;    // rise above min that ends the corner
         private const double CornerMinValidDropKmh = 10.0; // total drop required for a real corner (filters small lifts)
+        private const double CornerMinDisplaySeconds = 4.0; // how long the frozen corner min stays on screen after exit
 
         private int _cornerPhase = 0;
         private double _cornerPeakSpeed = 0;
         private double _cornerCurrentMin = 0;
         private double _lastCornerMinSpeed = -1;
         private double _cornerDisplayMin = -1;
+        private DateTime _cornerMinFrozenAt = DateTime.MinValue;
 
         internal void UpdateCornerMinSpeed(double speedKmh, bool gameRunning)
         {
@@ -54,6 +62,7 @@ namespace OpenFFBoardPlugin
             {
                 _cornerPhase = 0;
                 _cornerPeakSpeed = 0;
+                _cornerDisplayMin = -1; // don't leak a stale value into the next session
                 return;
             }
 
@@ -68,6 +77,10 @@ namespace OpenFFBoardPlugin
                 {
                     _cornerPhase = 1;
                     _cornerCurrentMin = speedKmh;
+                }
+                else if (_cornerDisplayMin >= 0 && (DateTime.UtcNow - _cornerMinFrozenAt).TotalSeconds >= CornerMinDisplaySeconds)
+                {
+                    _cornerDisplayMin = -1; // expired: dashboard falls back to live speed
                 }
             }
             else
@@ -86,9 +99,16 @@ namespace OpenFFBoardPlugin
                 if (speedKmh - _cornerCurrentMin >= CornerExitRiseKmh)
                 {
                     if (_cornerPeakSpeed - _cornerCurrentMin >= CornerMinValidDropKmh)
+                    {
                         _lastCornerMinSpeed = _cornerCurrentMin;
+                        _cornerDisplayMin = _lastCornerMinSpeed;
+                        _cornerMinFrozenAt = DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        _cornerDisplayMin = -1; // lift was too small to count as a corner
+                    }
 
-                    _cornerDisplayMin = _lastCornerMinSpeed; // freeze (or revert if the lift was too small)
                     _cornerPhase = 0;
                     _cornerPeakSpeed = speedKmh;
                 }
@@ -149,6 +169,9 @@ namespace OpenFFBoardPlugin
         public void End(PluginManager pluginManager)
         {
             this.SaveConfig();
+
+            _ffbClippingPollTimer?.Dispose();
+            _ffbClippingPollTimer = null;
 
             this.Disconnect();
         }
@@ -335,12 +358,55 @@ namespace OpenFFBoardPlugin
             var commands = ProfileToCommandConverter.ConvertProfileToCommands(profile, OpenFFBoard);
             await Task.Run(() =>
             {
-                commands.ForEach(cmd =>
+                lock (_hidCommandLock)
                 {
-                    if (!cmd())
-                        SimHub.Logging.Current.Error("Failed to execute command");
-                });
+                    commands.ForEach(cmd =>
+                    {
+                        if (!cmd())
+                            SimHub.Logging.Current.Error("Failed to execute command");
+                    });
+                }
             });
+        }
+
+        // ── FFB clipping detection ───────────────────────────────────────────────
+        // OpenFFBoard's HID API has no direct "clipping" signal, so this polls the live
+        // axis torque against the configured power cap and treats "near the cap" as clipping.
+        private const double FfbClippingThresholdRatio = 0.95;
+        private const int FfbClippingPollIntervalMs = 50;
+
+        private System.Threading.Timer _ffbClippingPollTimer;
+        private volatile bool _ffbClipping = false;
+
+        private void PollFfbClipping(object state)
+        {
+            try
+            {
+                var board = OpenFFBoard;
+                if (!Settings.ShowFFBClipping || board == null || !board.IsConnected)
+                {
+                    _ffbClipping = false;
+                    return;
+                }
+
+                long curTorque;
+                ushort power;
+                lock (_hidCommandLock)
+                {
+                    curTorque = board.Axis.GetCurtorque();
+                    power = board.Axis.GetPower();
+                }
+
+                _ffbClipping = power > 0 && Math.Abs(curTorque) >= power * FfbClippingThresholdRatio;
+            }
+            catch
+            {
+                _ffbClipping = false;
+            }
+            finally
+            {
+                _ffbClippingPollTimer?.Change(FfbClippingPollIntervalMs, System.Threading.Timeout.Infinite);
+            }
         }
 
         // ── Bundled dashboard auto-update ──────────────────────────────────────
@@ -376,9 +442,13 @@ namespace OpenFFBoardPlugin
             this.AttachDelegate(name: "InputDisplay.ShowGearAndSpeed", valueProvider: () => Settings.ShowGearAndSpeed);
             this.AttachDelegate(name: "InputDisplay.ShowExtras", valueProvider: () => Settings.ShowExtras);
             this.AttachDelegate(name: "InputDisplay.ShowSteering", valueProvider: () => Settings.ShowSteering);
+            this.AttachDelegate(name: "InputDisplay.ShowFFBClipping", valueProvider: () => Settings.ShowFFBClipping);
             this.AttachDelegate(name: "InputDisplay.WheelImage", valueProvider: () => Settings.WheelImage);
             this.AttachDelegate(name: "InputDisplay.CornerMinSpeedKmh", valueProvider: () => _cornerDisplayMin);
             this.AttachDelegate(name: "InputDisplay.LastCornerMinSpeedKmh", valueProvider: () => _lastCornerMinSpeed);
+            this.AttachDelegate(name: "InputDisplay.FFBClipping", valueProvider: () => _ffbClipping);
+
+            _ffbClippingPollTimer = new System.Threading.Timer(PollFfbClipping, null, 0, System.Threading.Timeout.Infinite);
 
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)

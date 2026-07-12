@@ -46,6 +46,7 @@ namespace OpenFFBoardPlugin
             ViewShowGearAndSpeed.IsChecked = Plugin.Settings.ShowGearAndSpeed;
             ViewShowExtras.IsChecked = Plugin.Settings.ShowExtras;
             ViewShowSteering.IsChecked = Plugin.Settings.ShowSteering;
+            ViewShowFFBClipping.IsChecked = Plugin.Settings.ShowFFBClipping;
             RefreshExtrasValueLabels();
 
             // Extra configurations: wheel image picker
@@ -98,6 +99,7 @@ namespace OpenFFBoardPlugin
             Plugin.Settings.ShowGearAndSpeed = ViewShowGearAndSpeed.IsChecked == true;
             Plugin.Settings.ShowExtras = ViewShowExtras.IsChecked == true;
             Plugin.Settings.ShowSteering = ViewShowSteering.IsChecked == true;
+            Plugin.Settings.ShowFFBClipping = ViewShowFFBClipping.IsChecked == true;
         }
 
         // ── Extra configurations: wheel image ──────────────────────────────────

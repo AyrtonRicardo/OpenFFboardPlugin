@@ -22,6 +22,7 @@
         public bool ShowGearAndSpeed = true;
         public bool ShowExtras = true;              // ABS / TC / BB block
         public bool ShowSteering = true;
+        public bool ShowFFBClipping = true;         // FFB clip indicator inside the ABS / TC / BB block
 
         /// <summary>
         /// Selected steering wheel graphic for the "Steering Wheel" layer.
