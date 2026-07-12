@@ -5,10 +5,12 @@ using SimHub.Plugins.Styles;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace OpenFFBoardPlugin
 {
@@ -17,20 +19,19 @@ namespace OpenFFBoardPlugin
     /// </summary>
     public partial class SettingsControl : UserControl
     {
-        public DataPlugin Plugin { get; }
+        public OpenFFBoardDataPlugin Plugin { get; }
 
         public SettingsControl()
         {
             InitializeComponent();
         }
 
-        public SettingsControl(DataPlugin plugin) : this()
+        public SettingsControl(OpenFFBoardDataPlugin plugin) : this()
         {
             Plugin = plugin;
 
             ViewAutoConnectOnStartup.IsChecked = Plugin.Settings.AutoConnectOnStartup;
             ViewAutoApplyOnGameChange.IsChecked = Plugin.Settings.AutoApplyProfileOnGameChange;
-            ViewAutoUpdateDashboards.IsChecked = Plugin.Settings.AutoUpdateDashboards;
             ViewPluginConfigJsonPath.Text = Plugin.GetCommonStoragePath();
 
             var profilePath = Plugin.Settings.ProfileJsonPath;
@@ -46,6 +47,12 @@ namespace OpenFFBoardPlugin
             ViewShowExtras.IsChecked = Plugin.Settings.ShowExtras;
             ViewShowSteering.IsChecked = Plugin.Settings.ShowSteering;
             RefreshExtrasValueLabels();
+
+            // Extra configurations: wheel image picker
+            ViewWheelClassicImage.Source = BitmapToImageSource(Properties.Resources.wheel_classic);
+            ViewWheelGtImage.Source = BitmapToImageSource(Properties.Resources.wheel_gt);
+            ViewWheelGt3Image.Source = BitmapToImageSource(Properties.Resources.gt3);
+            RefreshWheelImageSelection();
 
             RefreshProfileCount();
             RefreshCurrentGame();
@@ -91,6 +98,50 @@ namespace OpenFFBoardPlugin
             Plugin.Settings.ShowGearAndSpeed = ViewShowGearAndSpeed.IsChecked == true;
             Plugin.Settings.ShowExtras = ViewShowExtras.IsChecked == true;
             Plugin.Settings.ShowSteering = ViewShowSteering.IsChecked == true;
+        }
+
+        // ── Extra configurations: wheel image ──────────────────────────────────
+
+        private static readonly SolidColorBrush WheelOptionSelectedBrush = new SolidColorBrush(Color.FromRgb(0x4C, 0xAF, 0x50));
+
+        private static ImageSource BitmapToImageSource(System.Drawing.Bitmap bitmap)
+        {
+            using (var stream = new MemoryStream())
+            {
+                bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
+                stream.Position = 0;
+
+                var image = new BitmapImage();
+                image.BeginInit();
+                image.CacheOption = BitmapCacheOption.OnLoad;
+                image.StreamSource = stream;
+                image.EndInit();
+                image.Freeze();
+                return image;
+            }
+        }
+
+        private void RefreshWheelImageSelection()
+        {
+            var selected = Plugin.Settings.WheelImage;
+            ViewWheelOptionClassic.BorderBrush = (string)ViewWheelOptionClassic.Tag == selected
+                ? WheelOptionSelectedBrush
+                : Brushes.Transparent;
+            ViewWheelOptionGt.BorderBrush = (string)ViewWheelOptionGt.Tag == selected
+                ? WheelOptionSelectedBrush
+                : Brushes.Transparent;
+            ViewWheelOptionGt3.BorderBrush = (string)ViewWheelOptionGt3.Tag == selected
+                ? WheelOptionSelectedBrush
+                : Brushes.Transparent;
+        }
+
+        private void WheelOption_Selected(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (Plugin == null) return;
+            if (!(sender is Border border)) return;
+
+            Plugin.Settings.WheelImage = (string)border.Tag;
+            RefreshWheelImageSelection();
         }
 
         // ── Connection state ───────────────────────────────────────────────────
@@ -392,19 +443,6 @@ namespace OpenFFBoardPlugin
         {
             if (Plugin != null)
                 Plugin.Settings.AutoApplyProfileOnGameChange = false;
-        }
-
-        private void ViewAutoUpdateDashboards_Changed(object sender, RoutedEventArgs e)
-        {
-            if (Plugin == null) return;
-
-            bool enabled = ViewAutoUpdateDashboards.IsChecked == true;
-            bool wasEnabled = Plugin.Settings.AutoUpdateDashboards;
-            Plugin.Settings.AutoUpdateDashboards = enabled;
-
-            // run an update immediately when the user turns it on
-            if (enabled && !wasEnabled)
-                Plugin.UpdateBundledDashboards();
         }
     }
 

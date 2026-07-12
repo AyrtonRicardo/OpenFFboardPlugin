@@ -25,7 +25,7 @@ Works with iRacing, ACC, AC, and any other SimHub-supported game (uses generic t
 
 ## Configure via the plugin (no dashboard editing needed)
 
-With the OpenFFBoard companion plugin installed, open **OpenFFBoard companion → Dashboard Extras** in SimHub's left menu. Everything below is published as SimHub properties (`OpenFFBoardPlugin.InputDisplay.*`) that the dashboard reads live:
+With the OpenFFBoard companion plugin installed, open **OpenFFBoard companion → Dashboard Extras** in SimHub's left menu. Everything below is published as SimHub properties (`OpenFFBoardDataPlugin.InputDisplay.*`) that the dashboard reads live:
 
 | Setting | Property | Default |
 |---|---|---|
