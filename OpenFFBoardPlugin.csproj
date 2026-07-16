@@ -144,8 +144,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataPlugin.cs" />
-    <Compile Include="DataPluginSettings.cs" />
+    <Compile Include="OpenFFBoardDataPlugin.cs" />
+    <Compile Include="OpenFFBoardDataPluginSettings.cs" />
     <Compile Include="DemoDialogWindow.xaml.cs">
       <DependentUpon>DemoDialogWindow.xaml</DependentUpon>
     </Compile>

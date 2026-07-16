@@ -8,7 +8,7 @@
         "ValueExpression": {
           "JSExt": 0,
           "Interpreter": 1,
-          "Expression": "var range = $prop('OpenFFBoardPlugin.InputDisplay.SteeringRotationDegrees');\nif (range == null || range <= 0) range = 480;\nvar rad = $prop('GameRawData.Telemetry.SteeringWheelAngle');\nif (rad != null) return -rad * (180 / Math.PI);\nvar n = $prop('GameRawData.Physics.SteerAngle');\nif (n != null) return n * (range / 2);\nreturn 0;"
+          "Expression": "var range = $prop('OpenFFBoardDataPlugin.InputDisplay.SteeringRotationDegrees');\nif (range == null || range <= 0) range = 480;\nvar rad = $prop('GameRawData.Telemetry.SteeringWheelAngle');\nif (rad != null) return -rad * (180 / Math.PI);\nvar n = $prop('GameRawData.Physics.SteerAngle');\nif (n != null) return n * (range / 2);\nreturn 0;"
         },
         "EvaluateBeforeScreenRoles": false
       }
@@ -72,7 +72,7 @@
                   "Formula": {
                     "JSExt": 0,
                     "Interpreter": 1,
-                    "Expression": "var o = $prop('OpenFFBoardPlugin.InputDisplay.BackgroundOpacity');\nreturn (o == null) ? 70 : o;"
+                    "Expression": "var o = $prop('OpenFFBoardDataPlugin.InputDisplay.BackgroundOpacity');\nreturn (o == null) ? 70 : o;"
                   },
                   "Mode": 2
                 }
@@ -340,7 +340,7 @@
                   "Formula": {
                     "JSExt": 0,
                     "Interpreter": 1,
-                    "Expression": "var v = $prop('OpenFFBoardPlugin.InputDisplay.ShowTraces');\nreturn (v == null) ? true : v;"
+                    "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowTraces');\nreturn (v == null) ? true : v;"
                   },
                   "Mode": 2
                 }
@@ -647,7 +647,7 @@
                   "Formula": {
                     "JSExt": 0,
                     "Interpreter": 1,
-                    "Expression": "var v = $prop('OpenFFBoardPlugin.InputDisplay.ShowPedals');\nreturn (v == null) ? true : v;"
+                    "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowPedals');\nreturn (v == null) ? true : v;"
                   },
                   "Mode": 2
                 }
@@ -745,7 +745,7 @@
                               "Formula": {
                                 "JSExt": 0,
                                 "Interpreter": 1,
-                                "Expression": "var t = $prop('OpenFFBoardPlugin.InputDisplay.ShiftLightThresholdPercent');\nif (t == null || t <= 0 || t >= 100) t = 85;\nvar rpm = $prop('DataCorePlugin.GameData.Rpms');\nvar max = $prop('DataCorePlugin.GameData.MaxRpm');\nif (max == null || max <= 0) return false;\nvar pct = rpm / max * 100;\nvar i = repeatindex();\nvar step = (100 - t) / 6;\nreturn pct >= t + (i - 1) * step;"
+                                "Expression": "var t = $prop('OpenFFBoardDataPlugin.InputDisplay.ShiftLightThresholdPercent');\nif (t == null || t <= 0 || t >= 100) t = 85;\nvar rpm = $prop('DataCorePlugin.GameData.Rpms');\nvar max = $prop('DataCorePlugin.GameData.MaxRpm');\nif (max == null || max <= 0) return false;\nvar pct = rpm / max * 100;\nvar i = repeatindex();\nvar step = (100 - t) / 6;\nreturn pct >= t + (i - 1) * step;"
                               },
                               "Mode": 2
                             }
@@ -847,12 +847,22 @@
                   "VerticalAlignment": 1,
                   "CharWidth": 9.0,
                   "SpecialCharsWidth": 3.0,
-                  "SpecialChars": ".,:; "
+                  "SpecialChars": ".,:; ",
+                  "Bindings": {
+                    "Text": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var m = $prop('OpenFFBoardDataPlugin.InputDisplay.CornerMinSpeedKmh');\nreturn (m == null || m < 0) ? 'SPD' : 'MIN';"
+                      },
+                      "Mode": 2
+                    }
+                  }
                 },
                 {
                   "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
                   "BackgroundColor": "#00FFFFFF",
-                  "Height": 17.0,
+                  "Height": 20.0,
                   "Left": 34.0,
                   "Top": 59.0,
                   "Visible": true,
@@ -864,7 +874,7 @@
                   "IsTextItem": true,
                   "Font": "Roboto",
                   "FontWeight": "SemiBold",
-                  "FontSize": 15.0,
+                  "FontSize": 18.0,
                   "Text": "--",
                   "TextColor": "#FFFFD600",
                   "HorizontalAlignment": 1,
@@ -877,7 +887,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "var m = $prop('OpenFFBoardPlugin.InputDisplay.CornerMinSpeedKmh');\nif (m == null || m < 0) return '--';\nconst unit = $prop('SpeedLocalUnit');\nreturn '' + Math.round((unit == 'KMH') ? m : m * 0.621371);"
+                        "Expression": "var m = $prop('OpenFFBoardDataPlugin.InputDisplay.CornerMinSpeedKmh');\nif (m == null || m < 0) {\n  var live = $prop('SpeedLocal');\n  return (live == null) ? '--' : '' + Math.round(live);\n}\nconst unit = $prop('SpeedLocalUnit');\nreturn '' + Math.round((unit == 'KMH') ? m : m * 0.621371);"
                       },
                       "Mode": 2
                     },
@@ -885,7 +895,7 @@
                       "Formula": {
                         "JSExt": 0,
                         "Interpreter": 1,
-                        "Expression": "var m = $prop('OpenFFBoardPlugin.InputDisplay.CornerMinSpeedKmh');\nif (m == null || m < 0) return '#FF8A8A98';\nreturn (Math.abs($prop('SpeedKmh') - m) < 3) ? '#FFFFD600' : '#FFFFFFFF';"
+                        "Expression": "var m = $prop('OpenFFBoardDataPlugin.InputDisplay.CornerMinSpeedKmh');\nif (m == null || m < 0) return '#FF8A8A98';\nreturn (Math.abs($prop('SpeedKmh') - m) < 3) ? '#FFFFD600' : '#FFFFFFFF';"
                       },
                       "Mode": 2
                     }
@@ -964,7 +974,7 @@
                   "Formula": {
                     "JSExt": 0,
                     "Interpreter": 1,
-                    "Expression": "var v = $prop('OpenFFBoardPlugin.InputDisplay.ShowGearAndSpeed');\nreturn (v == null) ? true : v;"
+                    "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowGearAndSpeed');\nreturn (v == null) ? true : v;"
                   },
                   "Mode": 2
                 }
@@ -994,7 +1004,7 @@
                   "BackgroundColor": "#FF23232E",
                   "Height": 22.0,
                   "Left": 7.0,
-                  "Top": 22.0,
+                  "Top": 6.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 48.0,
@@ -1025,7 +1035,7 @@
                   "BackgroundColor": "#00FFFFFF",
                   "Height": 22.0,
                   "Left": 7.0,
-                  "Top": 22.0,
+                  "Top": 6.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 48.0,
@@ -1059,7 +1069,7 @@
                   "BackgroundColor": "#FF23232E",
                   "Height": 22.0,
                   "Left": 7.0,
-                  "Top": 53.0,
+                  "Top": 37.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 48.0,
@@ -1090,7 +1100,7 @@
                   "BackgroundColor": "#00FFFFFF",
                   "Height": 22.0,
                   "Left": 7.0,
-                  "Top": 53.0,
+                  "Top": 37.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 48.0,
@@ -1124,7 +1134,7 @@
                   "BackgroundColor": "#FF23232E",
                   "Height": 22.0,
                   "Left": 7.0,
-                  "Top": 84.0,
+                  "Top": 68.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 48.0,
@@ -1145,7 +1155,7 @@
                   "BackgroundColor": "#00FFFFFF",
                   "Height": 22.0,
                   "Left": 7.0,
-                  "Top": 84.0,
+                  "Top": 68.0,
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 48.0,
@@ -1173,6 +1183,87 @@
                       "Mode": 2
                     }
                   }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.RectangleItem, SimHub.Plugins",
+                  "BackgroundColor": "#FF23232E",
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 99.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 48.0,
+                  "Name": "CLIP Box",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "IsRectangleItem": true,
+                  "BorderStyle": {
+                    "BorderColor": "#FF3A3A46",
+                    "RadiusTopLeft": 4,
+                    "RadiusTopRight": 4,
+                    "RadiusBottomLeft": 4,
+                    "RadiusBottomRight": 4
+                  },
+                  "Bindings": {
+                    "BackgroundColor": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var ff = $prop('GameRawData.Physics.FinalFF');\nvar clipping = false;\nif (ff != null) clipping = Math.abs(ff) >= 0.98;\nelse { var pct = $prop('GameRawData.Telemetry.SteeringWheelPctTorque'); if (pct != null) clipping = Math.abs(pct) >= 0.98; }\nif (!clipping) return '#FF23232E';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFF6D00' : '#FF7A3300';"
+                      },
+                      "Mode": 2
+                    },
+                    "Visible": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowFFBClipping');\nreturn (v == null) ? true : v;"
+                      },
+                      "Mode": 2
+                    }
+                  }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.TextItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 22.0,
+                  "Left": 7.0,
+                  "Top": 99.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 48.0,
+                  "Name": "CLIP",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "IsTextItem": true,
+                  "Font": "Roboto",
+                  "FontWeight": "Bold",
+                  "FontSize": 10.0,
+                  "Text": "CLIP",
+                  "TextColor": "#FF8A8A98",
+                  "HorizontalAlignment": 1,
+                  "VerticalAlignment": 1,
+                  "CharWidth": 9.0,
+                  "SpecialCharsWidth": 3.0,
+                  "SpecialChars": ".,:; ",
+                  "Bindings": {
+                    "TextColor": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var ff = $prop('GameRawData.Physics.FinalFF');\nvar clipping = false;\nif (ff != null) clipping = Math.abs(ff) >= 0.98;\nelse { var pct = $prop('GameRawData.Telemetry.SteeringWheelPctTorque'); if (pct != null) clipping = Math.abs(pct) >= 0.98; }\nif (!clipping) return '#FF8A8A98';\nreturn (Math.floor(new Date().getTime()/200)%2==0) ? '#FFFFFFFF' : '#FFFFD9B3';"
+                      },
+                      "Mode": 2
+                    },
+                    "Visible": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowFFBClipping');\nreturn (v == null) ? true : v;"
+                      },
+                      "Mode": 2
+                    }
+                  }
                 }
               ],
               "Bindings": {
@@ -1180,7 +1271,7 @@
                   "Formula": {
                     "JSExt": 0,
                     "Interpreter": 1,
-                    "Expression": "var v = $prop('OpenFFBoardPlugin.InputDisplay.ShowExtras');\nreturn (v == null) ? true : v;"
+                    "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowExtras');\nreturn (v == null) ? true : v;"
                   },
                   "Mode": 2
                 }
@@ -1205,7 +1296,7 @@
                   "Visible": true,
                   "BlinkPhasisInverted": false,
                   "Width": 100.0,
-                  "Name": "Steering Wheel",
+                  "Name": "Steering Wheel Classic",
                   "RenderingSkip": 0,
                   "MinimumRefreshIntervalMS": 0.0,
                   "Image": "SteeringWheel",
@@ -1214,6 +1305,76 @@
                     "Rotation": {
                       "Formula": {
                         "Expression": "[variable.SteeringAngleDeg]"
+                      },
+                      "Mode": 2
+                    },
+                    "Visible": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.WheelImage');\nreturn (v == null) || (v != 'GT' && v != 'GT3');"
+                      },
+                      "Mode": 2
+                    }
+                  }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.ImageItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 100.0,
+                  "Left": 770.0,
+                  "Top": 14.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 100.0,
+                  "Name": "Steering Wheel GT",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "Image": "SteeringWheelGT",
+                  "AutoSize": false,
+                  "Bindings": {
+                    "Rotation": {
+                      "Formula": {
+                        "Expression": "[variable.SteeringAngleDeg]"
+                      },
+                      "Mode": 2
+                    },
+                    "Visible": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.WheelImage');\nreturn v == 'GT';"
+                      },
+                      "Mode": 2
+                    }
+                  }
+                },
+                {
+                  "$type": "SimHub.Plugins.OutputPlugins.GraphicalDash.Models.ImageItem, SimHub.Plugins",
+                  "BackgroundColor": "#00FFFFFF",
+                  "Height": 100.0,
+                  "Left": 770.0,
+                  "Top": 14.0,
+                  "Visible": true,
+                  "BlinkPhasisInverted": false,
+                  "Width": 100.0,
+                  "Name": "Steering Wheel GT3",
+                  "RenderingSkip": 0,
+                  "MinimumRefreshIntervalMS": 0.0,
+                  "Image": "SteeringWheelGT3",
+                  "AutoSize": false,
+                  "Bindings": {
+                    "Rotation": {
+                      "Formula": {
+                        "Expression": "[variable.SteeringAngleDeg]"
+                      },
+                      "Mode": 2
+                    },
+                    "Visible": {
+                      "Formula": {
+                        "JSExt": 0,
+                        "Interpreter": 1,
+                        "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.WheelImage');\nreturn v == 'GT3';"
                       },
                       "Mode": 2
                     }
@@ -1225,7 +1386,7 @@
                   "Formula": {
                     "JSExt": 0,
                     "Interpreter": 1,
-                    "Expression": "var v = $prop('OpenFFBoardPlugin.InputDisplay.ShowSteering');\nreturn (v == null) ? true : v;"
+                    "Expression": "var v = $prop('OpenFFBoardDataPlugin.InputDisplay.ShowSteering');\nreturn (v == null) ? true : v;"
                   },
                   "Mode": 2
                 }
@@ -1270,6 +1431,26 @@
       "Height": 256,
       "Length": 18977,
       "MD5": "a9ae2db3257eac1317b7c000a565e4d9"
+    },
+    {
+      "Name": "SteeringWheelGT",
+      "Extension": ".png",
+      "Modified": false,
+      "Optimized": true,
+      "Width": 256,
+      "Height": 256,
+      "Length": 6500,
+      "MD5": "e1f0e9be90eeb897573335bb27b6cef7"
+    },
+    {
+      "Name": "SteeringWheelGT3",
+      "Extension": ".png",
+      "Modified": false,
+      "Optimized": true,
+      "Width": 256,
+      "Height": 256,
+      "Length": 70764,
+      "MD5": "4d354868a23e6e967fc6574b2be271ce"
     }
   ],
   "Metadata": {

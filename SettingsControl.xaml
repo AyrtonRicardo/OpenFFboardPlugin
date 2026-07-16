@@ -6,7 +6,13 @@
              xmlns:styles="clr-namespace:SimHub.Plugins.Styles;assembly=SimHub.Plugins"
              mc:Ignorable="d">
 
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <styles:SHTabControl>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ═══ GENERAL ══════════════════════════════════════════════════════ -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <styles:SHTabItem Header="General">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Margin="0,0,12,16">
 
             <styles:SHSection Title="OpenFFBoard Companion" ShowSeparator="True">
@@ -223,11 +229,141 @@
 
                     <styles:SHSectionSeparator />
 
+                    <!-- ═══ PLUGIN SETTINGS ══════════════════════════════════════════ -->
+                    <styles:SHSubSection Title="Plugin Settings">
+                        <StackPanel>
+
+                            <Grid Margin="0,4,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="110" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <TextBlock Grid.Column="0"
+                                           Text="Settings file:"
+                                           Opacity="0.55"
+                                           VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="1"
+                                           x:Name="ViewPluginConfigJsonPath"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"
+                                           ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
+                            </Grid>
+
+                            <styles:SHButtonPrimary HorizontalAlignment="Left"
+                                                    Margin="0,10,0,0"
+                                                    Click="SaveConfiguration_Click">
+                                Save settings
+                            </styles:SHButtonPrimary>
+
+                        </StackPanel>
+                    </styles:SHSubSection>
+
+                </StackPanel>
+            </styles:SHSection>
+
+        </StackPanel>
+        </ScrollViewer>
+        </styles:SHTabItem>
+
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- ═══ EXTRA CONFIGURATIONS ═════════════════════════════════════════ -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <styles:SHTabItem Header="Extra configurations">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="0,0,12,16">
+
+            <styles:SHSection Title="Extra configurations" ShowSeparator="True">
+                <StackPanel>
+
+                    <styles:SHSubSection Title="Steering wheel image">
+                        <StackPanel>
+
+                            <TextBlock Text="Choose the wheel graphic shown by the 'Steering Wheel' layer on the 'OpenFFBoard Companion - Input Display' dashboard."
+                                       TextWrapping="Wrap"
+                                       Opacity="0.55"
+                                       FontSize="11"
+                                       Margin="0,4,0,10" />
+
+                            <WrapPanel x:Name="ViewWheelImageOptions">
+                                <Border x:Name="ViewWheelOptionClassic"
+                                        Tag="Classic"
+                                        Width="120"
+                                        Margin="0,0,12,12"
+                                        Padding="8"
+                                        CornerRadius="4"
+                                        BorderThickness="2"
+                                        BorderBrush="Transparent"
+                                        Background="#14FFFFFF"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="WheelOption_Selected">
+                                    <StackPanel>
+                                        <styles:ClippedImage x:Name="ViewWheelClassicImage"
+                                                             Width="96" Height="96"
+                                                             CornerRadius="4"
+                                                             Stretch="Uniform" />
+                                        <TextBlock Text="Classic"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,6,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border x:Name="ViewWheelOptionGt"
+                                        Tag="GT"
+                                        Width="120"
+                                        Margin="0,0,12,12"
+                                        Padding="8"
+                                        CornerRadius="4"
+                                        BorderThickness="2"
+                                        BorderBrush="Transparent"
+                                        Background="#14FFFFFF"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="WheelOption_Selected">
+                                    <StackPanel>
+                                        <styles:ClippedImage x:Name="ViewWheelGtImage"
+                                                             Width="96" Height="96"
+                                                             CornerRadius="4"
+                                                             Stretch="Uniform" />
+                                        <TextBlock Text="GT"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,6,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border x:Name="ViewWheelOptionGt3"
+                                        Tag="GT3"
+                                        Width="120"
+                                        Margin="0,0,12,12"
+                                        Padding="8"
+                                        CornerRadius="4"
+                                        BorderThickness="2"
+                                        BorderBrush="Transparent"
+                                        Background="#14FFFFFF"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="WheelOption_Selected">
+                                    <StackPanel>
+                                        <styles:ClippedImage x:Name="ViewWheelGt3Image"
+                                                             Width="96" Height="96"
+                                                             CornerRadius="4"
+                                                             Stretch="Uniform" />
+                                        <TextBlock Text="GT3"
+                                                   HorizontalAlignment="Center"
+                                                   Margin="0,6,0,0" />
+                                    </StackPanel>
+                                </Border>
+
+                            </WrapPanel>
+
+                        </StackPanel>
+                    </styles:SHSubSection>
+
+                    <styles:SHSectionSeparator />
+
                     <!-- ═══ DASHBOARD EXTRAS ═════════════════════════════════════════ -->
                     <styles:SHSubSection Title="Dashboard Extras">
                         <StackPanel>
 
-                            <TextBlock Text="Used by the 'OpenFFBoard Companion - Input Display' dashboard. Published as SimHub properties (OpenFFBoardPlugin.InputDisplay.*)."
+                            <TextBlock Text="Used by the 'OpenFFBoard Companion - Input Display' dashboard. Published as SimHub properties (OpenFFBoardDataPlugin.InputDisplay.*)."
                                        TextWrapping="Wrap"
                                        Opacity="0.55"
                                        FontSize="11"
@@ -311,46 +447,11 @@
                                                          Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
                                     Steering
                                 </styles:SHToggleCheckbox>
+                                <styles:SHToggleCheckbox x:Name="ViewShowFFBClipping" Margin="0,0,16,4"
+                                                         Checked="ModuleToggle_Changed" Unchecked="ModuleToggle_Changed">
+                                    FFB Clipping
+                                </styles:SHToggleCheckbox>
                             </WrapPanel>
-
-                        </StackPanel>
-                    </styles:SHSubSection>
-
-                    <styles:SHSectionSeparator />
-
-                    <!-- ═══ PLUGIN SETTINGS ══════════════════════════════════════════ -->
-                    <styles:SHSubSection Title="Plugin Settings">
-                        <StackPanel>
-
-                            <Grid Margin="0,4,0,0">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="110" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-
-                                <TextBlock Grid.Column="0"
-                                           Text="Settings file:"
-                                           Opacity="0.55"
-                                           VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1"
-                                           x:Name="ViewPluginConfigJsonPath"
-                                           TextTrimming="CharacterEllipsis"
-                                           VerticalAlignment="Center"
-                                           ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
-                            </Grid>
-
-                            <styles:SHToggleCheckbox x:Name="ViewAutoUpdateDashboards"
-                                                     Margin="0,10,0,0"
-                                                     Checked="ViewAutoUpdateDashboards_Changed"
-                                                     Unchecked="ViewAutoUpdateDashboards_Changed">
-                                Auto-update bundled dashboards on startup
-                            </styles:SHToggleCheckbox>
-
-                            <styles:SHButtonPrimary HorizontalAlignment="Left"
-                                                    Margin="0,10,0,0"
-                                                    Click="SaveConfiguration_Click">
-                                Save settings
-                            </styles:SHButtonPrimary>
 
                         </StackPanel>
                     </styles:SHSubSection>
@@ -359,5 +460,8 @@
             </styles:SHSection>
 
         </StackPanel>
-    </ScrollViewer>
+        </ScrollViewer>
+        </styles:SHTabItem>
+
+    </styles:SHTabControl>
 </UserControl>

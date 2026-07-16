@@ -18,14 +18,14 @@ namespace OpenFFBoardPlugin
     [PluginDescription("OpenFFBoard plugin to communicate with openffboard firmware")]
     [PluginAuthor("Ayrton Ricardo")]
     [PluginName("OpenFFBoard companion plugin")]
-    public class DataPlugin : IPlugin, IDataPlugin, IWPFSettingsV2
+    public class OpenFFBoardDataPlugin : IPlugin, IDataPlugin, IWPFSettingsV2
     {
         private enum AcceptableMainClassEnum
         {
             FFBMain = 1
         }
 
-        public DataPluginSettings Settings;
+        public OpenFFBoardDataPluginSettings Settings;
         public OpenFFBoard.Board OpenFFBoard;
         public IHidDevice[] BoardsHid = null;
         public string ActiveProfile = null;
@@ -37,16 +37,20 @@ namespace OpenFFBoardPlugin
         // ── Corner minimum speed tracking ──────────────────────────────────────
         // Phase machine: 0 = accelerating/steady (tracking peak), 1 = decelerating (tracking min).
         // Published as InputDisplay.CornerMinSpeedKmh: falls live with speed while decelerating
-        // through a corner, freezes at the corner minimum once the car accelerates away.
+        // through a corner, freezes at the corner minimum for CornerMinDisplaySeconds once the car
+        // accelerates away, then clears so the dashboard falls back to showing live speed.
+        // InputDisplay.LastCornerMinSpeedKmh keeps the permanent (non-expiring) record.
         private const double CornerEnterDropKmh = 5.0;   // drop below peak that starts "decelerating" phase
         private const double CornerExitRiseKmh = 5.0;    // rise above min that ends the corner
         private const double CornerMinValidDropKmh = 10.0; // total drop required for a real corner (filters small lifts)
+        private const double CornerMinDisplaySeconds = 4.0; // how long the frozen corner min stays on screen after exit
 
         private int _cornerPhase = 0;
         private double _cornerPeakSpeed = 0;
         private double _cornerCurrentMin = 0;
         private double _lastCornerMinSpeed = -1;
         private double _cornerDisplayMin = -1;
+        private DateTime _cornerMinFrozenAt = DateTime.MinValue;
 
         internal void UpdateCornerMinSpeed(double speedKmh, bool gameRunning)
         {
@@ -54,35 +58,53 @@ namespace OpenFFBoardPlugin
             {
                 _cornerPhase = 0;
                 _cornerPeakSpeed = 0;
+                _cornerDisplayMin = -1; // don't leak a stale value into the next session
                 return;
             }
 
             if (_cornerPhase == 0)
             {
                 if (speedKmh > _cornerPeakSpeed)
+                {
                     _cornerPeakSpeed = speedKmh;
+                }
 
                 if (_cornerPeakSpeed - speedKmh >= CornerEnterDropKmh)
                 {
                     _cornerPhase = 1;
                     _cornerCurrentMin = speedKmh;
                 }
+                else if (_cornerDisplayMin >= 0 && (DateTime.UtcNow - _cornerMinFrozenAt).TotalSeconds >= CornerMinDisplaySeconds)
+                {
+                    _cornerDisplayMin = -1; // expired: dashboard falls back to live speed
+                }
             }
             else
             {
                 if (speedKmh < _cornerCurrentMin)
+                {
                     _cornerCurrentMin = speedKmh;
+                }
 
                 // live value only once the drop is big enough to be a corner (avoids flicker on small lifts)
                 if (_cornerPeakSpeed - _cornerCurrentMin >= CornerMinValidDropKmh)
+                {
                     _cornerDisplayMin = _cornerCurrentMin;
+                }
 
                 if (speedKmh - _cornerCurrentMin >= CornerExitRiseKmh)
                 {
                     if (_cornerPeakSpeed - _cornerCurrentMin >= CornerMinValidDropKmh)
+                    {
                         _lastCornerMinSpeed = _cornerCurrentMin;
+                        _cornerDisplayMin = _lastCornerMinSpeed;
+                        _cornerMinFrozenAt = DateTime.UtcNow;
+                    }
+                    else
+                    {
+                        _cornerDisplayMin = -1; // lift was too small to count as a corner
+                    }
 
-                    _cornerDisplayMin = _lastCornerMinSpeed; // freeze (or revert if the lift was too small)
                     _cornerPhase = 0;
                     _cornerPeakSpeed = speedKmh;
                 }
@@ -348,63 +370,6 @@ namespace OpenFFBoardPlugin
         }
 
         /// <summary>
-        /// Extracts the dashboard bundled as an embedded resource (.simhubdash zip) into
-        /// SimHub's DashTemplates folder. Skipped when the installed DashboardVersion matches.
-        /// </summary>
-        internal void UpdateBundledDashboards(bool force = false)
-        {
-            try
-            {
-                string simhubDir = AppDomain.CurrentDomain.BaseDirectory;
-                string targetDir = Path.Combine(simhubDir, "DashTemplates", BundledDashboardName);
-                string metaFileName = BundledDashboardName + ".djson.metadata";
-
-                var assembly = Assembly.GetExecutingAssembly();
-                string resourceName = assembly.GetManifestResourceNames()
-                    .FirstOrDefault(n => n.EndsWith(".simhubdash", StringComparison.OrdinalIgnoreCase));
-                if (resourceName == null)
-                {
-                    SimHub.Logging.Current.Warn("Bundled dashboard resource not found, skipping dashboard update");
-                    return;
-                }
-
-                using (var stream = assembly.GetManifestResourceStream(resourceName))
-                using (var zip = new ZipArchive(stream, ZipArchiveMode.Read))
-                {
-                    string bundledVersion = null;
-                    var metaEntry = zip.GetEntry(metaFileName);
-                    if (metaEntry != null)
-                        using (var reader = new StreamReader(metaEntry.Open()))
-                            bundledVersion = ExtractDashboardVersion(reader.ReadToEnd());
-
-                    string installedMetaPath = Path.Combine(targetDir, metaFileName);
-                    string installedVersion = File.Exists(installedMetaPath)
-                        ? ExtractDashboardVersion(File.ReadAllText(installedMetaPath))
-                        : null;
-
-                    if (!force && bundledVersion != null && bundledVersion == installedVersion)
-                        return; // already up to date
-
-                    Directory.CreateDirectory(targetDir);
-                    foreach (var entry in zip.Entries)
-                    {
-                        string destination = Path.Combine(targetDir, entry.Name);
-                        using (var source = entry.Open())
-                        using (var file = File.Create(destination))
-                            source.CopyTo(file);
-                    }
-
-                    SimHub.Logging.Current.Info(
-                        $"Updated bundled dashboard '{BundledDashboardName}' from version {installedVersion ?? "none"} to {bundledVersion ?? "unknown"}");
-                }
-            }
-            catch (Exception ex)
-            {
-                SimHub.Logging.Current.Warn($"Dashboard auto-update failed: {ex.Message}");
-            }
-        }
-
-        /// <summary>
         /// Called once after plugins startup
         /// Plugins are rebuilt at game change
         /// </summary>
@@ -414,7 +379,7 @@ namespace OpenFFBoardPlugin
             SimHub.Logging.Current.Info("Starting plugin");
 
             // Load settings
-            Settings = this.ReadCommonSettings<DataPluginSettings>(settingsName, () => new DataPluginSettings());
+            Settings = this.ReadCommonSettings<OpenFFBoardDataPluginSettings>(settingsName, () => new OpenFFBoardDataPluginSettings());
 
             // Dashboard extras: published as properties so the
             // "OpenFFBoard Companion - Input Display" dashboard (and any other dash)
@@ -427,11 +392,10 @@ namespace OpenFFBoardPlugin
             this.AttachDelegate(name: "InputDisplay.ShowGearAndSpeed", valueProvider: () => Settings.ShowGearAndSpeed);
             this.AttachDelegate(name: "InputDisplay.ShowExtras", valueProvider: () => Settings.ShowExtras);
             this.AttachDelegate(name: "InputDisplay.ShowSteering", valueProvider: () => Settings.ShowSteering);
+            this.AttachDelegate(name: "InputDisplay.ShowFFBClipping", valueProvider: () => Settings.ShowFFBClipping);
+            this.AttachDelegate(name: "InputDisplay.WheelImage", valueProvider: () => Settings.WheelImage);
             this.AttachDelegate(name: "InputDisplay.CornerMinSpeedKmh", valueProvider: () => _cornerDisplayMin);
             this.AttachDelegate(name: "InputDisplay.LastCornerMinSpeedKmh", valueProvider: () => _lastCornerMinSpeed);
-
-            if (Settings.AutoUpdateDashboards)
-                UpdateBundledDashboards();
 
             /*
             // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)

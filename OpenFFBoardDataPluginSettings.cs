@@ -3,18 +3,12 @@
     /// <summary>
     /// Settings class, make sure it can be correctly serialized using JSON.net
     /// </summary>
-    public class DataPluginSettings
+    public class OpenFFBoardDataPluginSettings
     {
         public bool AutoConnectOnStartup = false;
         public bool AutoApplyProfileOnGameChange = false;
         public string ProfileJsonPath = null;
         public string SelectedHidDeviceId = null;
-
-        /// <summary>
-        /// When true, the dashboard bundled in the plugin DLL is extracted into SimHub's
-        /// DashTemplates folder on startup whenever its version differs from the installed one.
-        /// </summary>
-        public bool AutoUpdateDashboards = true;
 
         /// <summary>
         /// Dashboard extras: published as SimHub properties (InputDisplay.*) and consumed
@@ -28,5 +22,12 @@
         public bool ShowGearAndSpeed = true;
         public bool ShowExtras = true;              // ABS / TC / BB block
         public bool ShowSteering = true;
+        public bool ShowFFBClipping = true;         // FFB clip indicator inside the ABS / TC / BB block
+
+        /// <summary>
+        /// Selected steering wheel graphic for the "Steering Wheel" layer.
+        /// Must match one of the "Images" entries defined in the bundled dashboard's .djson.
+        /// </summary>
+        public string WheelImage = "Classic";
     }
 }
