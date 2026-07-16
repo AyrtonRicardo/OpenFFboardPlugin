@@ -4,11 +4,6 @@ using OpenFFBoardPlugin.DTO;
 using OpenFFBoardPlugin.Utils;
 using SimHub.Plugins;
 using System;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Media;
 using WoteverCommon.Extensions;
@@ -359,16 +354,6 @@ namespace OpenFFBoardPlugin
             });
         }
 
-        // ── Bundled dashboard auto-update ──────────────────────────────────────
-
-        private const string BundledDashboardName = "OpenFFBoard Companion - Input Display";
-
-        private static string ExtractDashboardVersion(string metadataJson)
-        {
-            var match = Regex.Match(metadataJson ?? "", "\"DashboardVersion\"\\s*:\\s*\"([^\"]+)\"");
-            return match.Success ? match.Groups[1].Value : null;
-        }
-
         /// <summary>
         /// Called once after plugins startup
         /// Plugins are rebuilt at game change
@@ -397,39 +382,15 @@ namespace OpenFFBoardPlugin
             this.AttachDelegate(name: "InputDisplay.CornerMinSpeedKmh", valueProvider: () => _cornerDisplayMin);
             this.AttachDelegate(name: "InputDisplay.LastCornerMinSpeedKmh", valueProvider: () => _lastCornerMinSpeed);
 
-            /*
-            // Declare a property available in the property list, this gets evaluated "on demand" (when shown or used in formulas)
-            //this.AttachDelegate(name: "CurrentDateTime", valueProvider: () => DateTime.Now);
-
-            // Declare an event
-            this.AddEvent(eventName: "SpeedWarning");
-
-            // Declare an action which can be called
-            this.AddAction(
-                actionName: "IncrementSpeedWarning",
-                actionStart: (a, b) =>
-                {
-                    Settings.SpeedWarningLevel++;
-                    SimHub.Logging.Current.Info("Speed warning changed");
-                });
-
-            // Declare an action which can be called, actions are meant to be "triggered" and does not reflect an input status (pressed/released ...)
-            this.AddAction(
-                actionName: "DecrementSpeedWarning",
-                actionStart: (a, b) =>
-                {
-                    Settings.SpeedWarningLevel--;
-                });
-
-            // Declare an input which can be mapped, inputs are meant to be keeping state of the source inputs,
-            // they won't trigger on inputs not capable of "holding" their state.
-            // Internally they work similarly to AddAction, but are restricted to a "during" behavior
-            this.AddInputMapping(
-                inputName: "InputPressed",
-                inputPressed: (a, b) => {/* One of the mapped input has been pressed   * /},
-                inputReleased: (a, b) => {/* One of the mapped input has been released * /}
-            );
-            */
+            // Race info extras: published as properties so the
+            // "OpenFFBoard Companion - Race Info" dashboard can bind to them.
+            this.AttachDelegate(name: "RaceInfo.BackgroundOpacity", valueProvider: () => Settings.RaceInfoBackgroundOpacity);
+            this.AttachDelegate(name: "RaceInfo.ShowPosition", valueProvider: () => Settings.RaceInfoShowPosition);
+            this.AttachDelegate(name: "RaceInfo.ShowSession", valueProvider: () => Settings.RaceInfoShowSession);
+            this.AttachDelegate(name: "RaceInfo.ShowLapTiming", valueProvider: () => Settings.RaceInfoShowLapTiming);
+            this.AttachDelegate(name: "RaceInfo.ShowFuel", valueProvider: () => Settings.RaceInfoShowFuel);
+            this.AttachDelegate(name: "RaceInfo.ShowTemps", valueProvider: () => Settings.RaceInfoShowTemps);
+            this.AttachDelegate(name: "RaceInfo.ShowTyres", valueProvider: () => Settings.RaceInfoShowTyres);
         }
     }
 }

@@ -29,5 +29,17 @@
         /// Must match one of the "Images" entries defined in the bundled dashboard's .djson.
         /// </summary>
         public string WheelImage = "Classic";
+
+        /// <summary>
+        /// Race info extras: published as SimHub properties (RaceInfo.*) and consumed
+        /// by the "OpenFFBoard Companion - Race Info" dashboard.
+        /// </summary>
+        public int RaceInfoBackgroundOpacity = 70; // overlay background opacity, 0-100
+        public bool RaceInfoShowPosition = true;
+        public bool RaceInfoShowSession = true;
+        public bool RaceInfoShowLapTiming = true;
+        public bool RaceInfoShowFuel = true;
+        public bool RaceInfoShowTemps = true;
+        public bool RaceInfoShowTyres = true;
     }
 }
