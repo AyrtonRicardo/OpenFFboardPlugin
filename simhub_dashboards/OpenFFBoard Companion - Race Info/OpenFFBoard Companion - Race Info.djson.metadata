@@ -1,0 +1,25 @@
+{
+  "ScreenCount": 1.0,
+  "InGameScreensIndexs": [
+    0
+  ],
+  "IdleScreensIndexs": [
+    0
+  ],
+  "MainPreviewIndex": 0,
+  "IsOverlay": true,
+  "OverlaySizeWarning": false,
+  "MetadataVersion": 2.0,
+  "EnableOnDashboardMessaging": false,
+  "PitScreensIndexs": [
+    0
+  ],
+  "SimHubVersion": "9.11.1",
+  "Category": "OpenFFBoard",
+  "Title": "OpenFFBoard Companion - Race Info",
+  "Description": "Race info overlay: position, session/flags, lap timing & delta, fuel, track/air temp, tyre temps. Works with iRacing, ACC, AC and more.",
+  "Author": "Ayrton Ricardo",
+  "Width": 880.0,
+  "Height": 150.0,
+  "DashboardVersion": "1.0"
+}

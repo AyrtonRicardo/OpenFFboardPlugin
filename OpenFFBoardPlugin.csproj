@@ -146,12 +146,6 @@
   <ItemGroup>
     <Compile Include="OpenFFBoardDataPlugin.cs" />
     <Compile Include="OpenFFBoardDataPluginSettings.cs" />
-    <Compile Include="DemoDialogWindow.xaml.cs">
-      <DependentUpon>DemoDialogWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DemoWindow.xaml.cs">
-      <DependentUpon>DemoWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="DTO\Profile.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -166,14 +160,6 @@
     <Compile Include="Utils\ProfileToCommandConverter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DemoDialogWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="DemoWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Properties\DesignTimeResources.xaml" Condition="'$(DesignTime)'=='true' OR ('$(SolutionPath)'!='' AND Exists('$(SolutionPath)') AND '$(BuildingInsideVisualStudio)'!='true' AND '$(BuildingInsideExpressionBlend)'!='true')">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -194,6 +180,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="simhub_dashboards\OpenFFBoard Companion - Input Display.simhubdash" />
+    <EmbeddedResource Include="simhub_dashboards\OpenFFBoard Companion - Race Info.simhubdash" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -201,7 +188,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>XCOPY /Y /R "$(TargetDir)OpenFFB*" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Hid.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Device.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R /I /E "$(ProjectDir)simhub_dashboards\OpenFFBoard Companion - Input Display\*" "$(SIMHUB_INSTALL_PATH)DashTemplates\OpenFFBoard Companion - Input Display\"</PostBuildEvent>
+    <PostBuildEvent>XCOPY /Y /R "$(TargetDir)OpenFFB*" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Hid.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R "$(TargetDir)Device.Net.dll" "$(SIMHUB_INSTALL_PATH)" &amp;&amp; XCOPY /Y /R /I /E "$(ProjectDir)simhub_dashboards\OpenFFBoard Companion - Input Display\*" "$(SIMHUB_INSTALL_PATH)DashTemplates\OpenFFBoard Companion - Input Display\" &amp;&amp; XCOPY /Y /R /I /E "$(ProjectDir)simhub_dashboards\OpenFFBoard Companion - Race Info\*" "$(SIMHUB_INSTALL_PATH)DashTemplates\OpenFFBoard Companion - Race Info\"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

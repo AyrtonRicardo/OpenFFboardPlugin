@@ -49,6 +49,16 @@ namespace OpenFFBoardPlugin
             ViewShowFFBClipping.IsChecked = Plugin.Settings.ShowFFBClipping;
             RefreshExtrasValueLabels();
 
+            // Race info extras
+            ViewRaceInfoBackgroundOpacity.Value = Plugin.Settings.RaceInfoBackgroundOpacity;
+            ViewRaceInfoShowPosition.IsChecked = Plugin.Settings.RaceInfoShowPosition;
+            ViewRaceInfoShowSession.IsChecked = Plugin.Settings.RaceInfoShowSession;
+            ViewRaceInfoShowLapTiming.IsChecked = Plugin.Settings.RaceInfoShowLapTiming;
+            ViewRaceInfoShowFuel.IsChecked = Plugin.Settings.RaceInfoShowFuel;
+            ViewRaceInfoShowTemps.IsChecked = Plugin.Settings.RaceInfoShowTemps;
+            ViewRaceInfoShowTyres.IsChecked = Plugin.Settings.RaceInfoShowTyres;
+            RefreshRaceInfoValueLabels();
+
             // Extra configurations: wheel image picker
             ViewWheelClassicImage.Source = BitmapToImageSource(Properties.Resources.wheel_classic);
             ViewWheelGtImage.Source = BitmapToImageSource(Properties.Resources.wheel_gt);
@@ -100,6 +110,31 @@ namespace OpenFFBoardPlugin
             Plugin.Settings.ShowExtras = ViewShowExtras.IsChecked == true;
             Plugin.Settings.ShowSteering = ViewShowSteering.IsChecked == true;
             Plugin.Settings.ShowFFBClipping = ViewShowFFBClipping.IsChecked == true;
+        }
+
+        // ── Race info extras ────────────────────────────────────────────────────
+
+        private void RefreshRaceInfoValueLabels()
+        {
+            ViewRaceInfoBackgroundOpacityValue.Text = $"{(int)ViewRaceInfoBackgroundOpacity.Value}%";
+        }
+
+        private void ViewRaceInfoBackgroundOpacity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (Plugin == null) return;
+            Plugin.Settings.RaceInfoBackgroundOpacity = (int)e.NewValue;
+            RefreshRaceInfoValueLabels();
+        }
+
+        private void RaceInfoModuleToggle_Changed(object sender, RoutedEventArgs e)
+        {
+            if (Plugin == null) return;
+            Plugin.Settings.RaceInfoShowPosition = ViewRaceInfoShowPosition.IsChecked == true;
+            Plugin.Settings.RaceInfoShowSession = ViewRaceInfoShowSession.IsChecked == true;
+            Plugin.Settings.RaceInfoShowLapTiming = ViewRaceInfoShowLapTiming.IsChecked == true;
+            Plugin.Settings.RaceInfoShowFuel = ViewRaceInfoShowFuel.IsChecked == true;
+            Plugin.Settings.RaceInfoShowTemps = ViewRaceInfoShowTemps.IsChecked == true;
+            Plugin.Settings.RaceInfoShowTyres = ViewRaceInfoShowTyres.IsChecked == true;
         }
 
         // ── Extra configurations: wheel image ──────────────────────────────────

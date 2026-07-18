@@ -6,9 +6,6 @@ namespace OpenFFBoardPlugin.Utils
 {
     internal class ProfileToCommandConverter
     {
-        internal OpenFFBoard.Commands.FX fx = null;
-        internal OpenFFBoard.Commands.FX axis = null;
-
         /**
          * Let's map the JSON "Cls" key to the actual command class types.
          */
