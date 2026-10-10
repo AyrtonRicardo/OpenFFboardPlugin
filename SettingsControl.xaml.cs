@@ -21,6 +21,10 @@ namespace OpenFFBoardPlugin
     {
         public OpenFFBoardDataPlugin Plugin { get; }
 
+        // True while the controls are being populated from settings, so change handlers
+        // don't write half-initialized values back over the loaded settings.
+        private bool _loading;
+
         public SettingsControl()
         {
             InitializeComponent();
@@ -29,6 +33,19 @@ namespace OpenFFBoardPlugin
         public SettingsControl(OpenFFBoardDataPlugin plugin) : this()
         {
             Plugin = plugin;
+            _loading = true;
+            try
+            {
+                LoadFromSettings();
+            }
+            finally
+            {
+                _loading = false;
+            }
+        }
+
+        private void LoadFromSettings()
+        {
 
             ViewAutoConnectOnStartup.IsChecked = Plugin.Settings.AutoConnectOnStartup;
             ViewAutoApplyOnGameChange.IsChecked = Plugin.Settings.AutoApplyProfileOnGameChange;
@@ -82,28 +99,28 @@ namespace OpenFFBoardPlugin
 
         private void ViewSteeringRotation_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             Plugin.Settings.SteeringRotationDegrees = (int)e.NewValue;
             RefreshExtrasValueLabels();
         }
 
         private void ViewBackgroundOpacity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             Plugin.Settings.BackgroundOpacity = (int)e.NewValue;
             RefreshExtrasValueLabels();
         }
 
         private void ViewShiftLightThreshold_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             Plugin.Settings.ShiftLightThresholdPercent = (int)e.NewValue;
             RefreshExtrasValueLabels();
         }
 
         private void ModuleToggle_Changed(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             Plugin.Settings.ShowTraces = ViewShowTraces.IsChecked == true;
             Plugin.Settings.ShowPedals = ViewShowPedals.IsChecked == true;
             Plugin.Settings.ShowGearAndSpeed = ViewShowGearAndSpeed.IsChecked == true;
@@ -121,14 +138,14 @@ namespace OpenFFBoardPlugin
 
         private void ViewRaceInfoBackgroundOpacity_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             Plugin.Settings.RaceInfoBackgroundOpacity = (int)e.NewValue;
             RefreshRaceInfoValueLabels();
         }
 
         private void RaceInfoModuleToggle_Changed(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             Plugin.Settings.RaceInfoShowPosition = ViewRaceInfoShowPosition.IsChecked == true;
             Plugin.Settings.RaceInfoShowSession = ViewRaceInfoShowSession.IsChecked == true;
             Plugin.Settings.RaceInfoShowLapTiming = ViewRaceInfoShowLapTiming.IsChecked == true;
@@ -174,7 +191,7 @@ namespace OpenFFBoardPlugin
 
         private void WheelOption_Selected(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
             if (!(sender is Border border)) return;
 
             Plugin.Settings.WheelImage = (string)border.Tag;
@@ -278,7 +295,7 @@ namespace OpenFFBoardPlugin
 
         private async void ViewBoards_Loaded(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             await Plugin.RefreshBoardsAsync();
 
@@ -329,7 +346,7 @@ namespace OpenFFBoardPlugin
 
         private async void ViewSelectedCom_Connect(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             ShowError(null);
 
@@ -361,7 +378,7 @@ namespace OpenFFBoardPlugin
 
         private async void ViewSelectedCom_Disconnect(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             ShowError(null);
 
@@ -384,7 +401,7 @@ namespace OpenFFBoardPlugin
 
         private void SaveConfiguration_Click(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             ShowError(null);
             try
@@ -399,7 +416,7 @@ namespace OpenFFBoardPlugin
 
         private async void CreateProfileForCurrentGame_Click(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             ShowError(null);
             RefreshCurrentGame();
@@ -422,7 +439,7 @@ namespace OpenFFBoardPlugin
 
         private async void ApplyCurrentProfile_Click(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             ShowError(null);
 
@@ -447,7 +464,7 @@ namespace OpenFFBoardPlugin
 
         private void SelectProfileJsonPath_Click(object sender, RoutedEventArgs e)
         {
-            if (Plugin == null) return;
+            if (Plugin == null || _loading) return;
 
             var dialog = new System.Windows.Forms.FolderBrowserDialog();
             if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
